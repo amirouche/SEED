@@ -1512,7 +1512,7 @@ centrally, read §15.1.7, write §15.1.8, eq? §4.2.1, and equal? §4.3.1.
 > explicit meta-circular evaluator, may be straightforwardly achieved
 > in Kernel by applying the built-in evaluator algorithm with a
 > different environment.
-
+g
 ### 3.5 Partitioning of types
 
 In each module, certain of its primitive applicatives are identified as
