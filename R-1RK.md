@@ -2082,51 +2082,52 @@ Library features associated with type boolean will be described in
 ```
 
 The primitive type predicate for type boolean.  Because there are only
-two values in the type, predicate boolean? could be con- structed as a
+two values in the type, predicate boolean? could be constructed as a
 library combiner. However, designating it a primitive type predicate
 satisfies the requirements for partitioning of types from §3.5.
 
 ### 4.2 Equivalence under mutation (optional)
 
-Rationale:
-
-Kernel has two general-purpose equivalence predicates, whereas R5RS
-Scheme has three. The two Kernel predicates correspond to the abstract
-notions of equivalence up to mutation (equal?, §4.3), and in the
-presence of mutation (eq?, in this module). Scheme assigns the
-abstract notion of equivalence in the presence of mutation to an
-intermediate predicate eqv?, and uses predicate eq? for the
-technically stronger equivalence between objects whose eqv? -ness can
-be verified especially quickly in any particular implemen- tation.  In
-language design terms, Scheme introduces a third equivalence predicate
-for the express purpose of promoting implementation-dependent
-intrusion of concrete perfor- mance issues on the abstract semantics
-of the language — which directly violates Kernel's principles on
-simplicity and generality as well as its guideline on efficiency (G5 of
-§0.1.2).
-
-The criterion for another module to assume this one is that the
-assuming module supports mutation that could cause objects to be
-equal? but not eq? . For example, Pair mutation assumes this module,
-but Environment mutation does not.
-
-For cross-implementation compatibility, the behavior of eq? is defined
-in terms of a comprehensive implementation of Kernel. For example, two
-pairs returned by different calls to cons are not eq?, even if they
-have the same car and cdr and the implementa- tion doesn't support
-pair mutation; and two empty environments returned by different calls
-to make-environment are not eq?, even if the implementation doesn't
-support en- vironment mutation. The latter case shows how the
-implementation-independence can impact implementations even if they
-don't support eq?, since the behavior of required predicate equal? on
-environments is tied to that of eq? (which is, in turn, why module
-Environment mutation does not require this module).
-
-40
+> Rationale:
+>
+> Kernel has two general-purpose equivalence predicates, whereas R5RS
+> Scheme has three. The two Kernel predicates correspond to the
+> abstract notions of equivalence up to mutation (equal?, §4.3), and
+> in the presence of mutation (eq?, in this module). Scheme assigns
+> the abstract notion of equivalence in the presence of mutation to an
+> intermediate predicate eqv?, and uses predicate eq? for the
+> technically stronger equivalence between objects whose eqv? -ness
+> can be verified especially quickly in any particular implemen-
+> tation.  In language design terms, Scheme introduces a third
+> equivalence predicate for the express purpose of promoting
+> implementation-dependent intrusion of concrete performance issues on
+> the abstract semantics of the language — which directly violates
+> Kernel's principles on simplicity and generality as well as its
+> guideline on efficiency (G5 of §0.1.2).
+>
+> The criterion for another module to assume this one is that the
+> assuming module supports mutation that could cause objects to be
+> equal? but not eq? . For example, Pair mutation assumes this module,
+> but Environment mutation does not.
+>
+> For cross-implementation compatibility, the behavior of eq? is
+> defined in terms of a comprehensive implementation of Kernel. For
+> example, two pairs returned by different calls to cons are not eq?,
+> even if they have the same car and cdr and the implementa- tion
+> doesn't support pair mutation; and two empty environments returned
+> by different calls to make-environment are not eq?, even if the
+> implementation doesn't support en- vironment mutation. The latter
+> case shows how the implementation-independence can impact
+> implementations even if they don't support eq?, since the behavior
+> of required predicate equal? on environments is tied to that of eq?
+> (which is, in turn, why module Environment mutation does not require
+> this module).
 
 #### 4.2.1 eq?
 
+```scheme
 (eq? object1 object2 )
+```
 
 Predicate that returns true iff object1 and object2 are effectively
 (§3.7) the same object, even in the presence of mutation. The
@@ -2173,7 +2174,9 @@ in §6.5.1.
 
 #### 4.3.1 equal?
 
+```scheme
 (equal? object1 object2 )
+```
 
 Predicate that returns true iff object1 and object2 "look" the same as
 long as nothing is mutated. This is a weaker predicate than eq? ; that
@@ -2188,9 +2191,7 @@ description of the type.
 
 2 If eq? would return true, equal? must return true.
 
-41
-
-3 If the two objects (object1 and object2 ) are non-interchangeable
+3 If the two objects (object1 and object2 ) are non-interchangeable
 in any way that could affect the behavior of a Kernel program that (a)
 performs no mutation and (b) doesn't use eq? (neither directly nor
 indirectly), then equal? must return false. For example:
@@ -2219,41 +2220,17 @@ evaluation), (c) performs no mutation, and (d) always terminates
 finite), then equal? must return true. For example,
 
 – Suppose variables x and y are set up by evaluating the following
-sequence
+sequence of expressions.
 
-of expressions.
-
+```scheme
 ($define! x (list 1)) ($define! y (list 1 1)) (append! x x) (append! y
 y)
+```
 
 Then (equal? x y) would evaluate to #t.
 
-x
-
-q
-
-y
-
-q
-
-q
-
-q
-
-1
-
-q
-
-1
-
-q
-
-1
-
 5 For any particular two objects, the result returned by equal? is
-always the
-
-same during a period of time over which no mutation occurs.
+always the same during a period of time over which no mutation occurs.
 
 It is generally recommended that equal? return false in all cases
 where these rules do not require it to return true.
@@ -2265,18 +2242,15 @@ Rationale:
 
 The Kernel predicate equal?, unlike its Scheme counterpart, has to
 terminate for all possible arguments (since it isn't given
-dispensation to do otherwise). The set of cases in
-
-42
-
-which equal? is required, by Rule 3 above, to return false is
-formally undecidable; that doesn't interfere with termination of
-equal?, but does guarantee that the terminating predicate returns
-false in some cases where it isn't required to. (Terminating predicate
-eq?  must similarly return false in some unrequired cases; see §4.10.)
-The set of cases in which equal? is required to return true, by Rule 4
-above, might appear at first glance to be undecidable but, in practice,
-it is unproblematically decidable. Because Rule 4 stipulates that the
+dispensation to do otherwise). The set of cases in which equal? is
+required, by Rule 3 above, to return false is formally undecidable;
+that doesn't interfere with termination of equal?, but does guarantee
+that the terminating predicate returns false in some cases where it
+isn't required to. (Terminating predicate eq?  must similarly return
+false in some unrequired cases; see §4.10.)  The set of cases in which
+equal? is required to return true, by Rule 4 above, might appear at
+first glance to be undecidable but, in practice, it is
+unproblematically decidable. Because Rule 4 stipulates that the
 determining program can only examine the objects passively, the
 determining program cannot get bogged down in comparing the formally
 undecidable active behavior of algorithms; degree of encapsulation
@@ -2328,8 +2302,6 @@ void . The later Scheme reports describe the results of for-effect
 procedures as ‘unspecified', which is a politically neces- sary hedge
 because different Scheme implementations already in place follow a
 variety of
-
-43
 
 conventions concerning the return values of such
 procedures. Unfortunately, some Scheme implementations allow for-effect
@@ -2388,8 +2360,6 @@ a specialized shorthand; so both clarity (thus accident-avoidance, G3
 of §0.1.2) and simplicity are against its inclusion in the
 language. (Similar issues arise for $cond , §5.6.1.)
 
-44
-
 ### 4.6 Pairs and lists
 
 A pair is an object that refers to two other objects, called its car
@@ -2441,13 +2411,9 @@ The primitive type predicate for type null.
 (cons object1 object2 )
 
 A new pair object is constructed and returned, whose car and cdr
-referents are
+referents are respectively object1 and object2 .
 
-respectively object1 and object2 .
-
-45
-
-Note that the general laws governing mutation (§3.8: constructed
+Note that the general laws governing mutation (§3.8: constructed
 objects are mu- table unless otherwise stated) and the general laws
 governing eq? (§4.2.1: indepen- dently mutable objects aren't eq? )
 conspire to guarantee that the objects returned by two different calls
@@ -2464,9 +2430,7 @@ the Equivalence under mutation module (§4.2), and the Numbers module
 Rationale:
 
 The Equivalence under mutation module is assumed because pairs may be
-equal?
-
-without being eq? . The Numbers module is used to index lists.
+equal? without being eq? . The Numbers module is used to index lists.
 
 #### 4.7.1 set-car!, set-cdr!
 
@@ -2499,12 +2463,9 @@ If object is not a pair, the applicative returns object. Otherwise (if
 object is a pair), the applicative returns an immutable pair whose car
 and cdr would be suitable results for (copy-es-immutable (car object))
 and (copy-es-immutable (cdr object)), respectively. Further, the
-evaluation structure of the returned value is
-
-46
-
-isomorphic (§3.9) to that of object at the time of copying, with
-corresponding non- pair referents being eq? .
+evaluation structure of the returned value is isomorphic (§3.9) to
+that of object at the time of copying, with corresponding non- pair
+referents being eq? .
 
 These constraints imply that the result returned by copy-es-immutable
 must be initially equal? to object. They also imply that if object is
@@ -2563,15 +2524,11 @@ library feature.  It can be derived using $vau , by exploiting the
 fact that $vau immutably copies the evaluation structures of the
 bodies of compound operatives. We prefer to list copy-es- immutable as
 a primitive prior to $vau , so that we can explain and discuss
-immutable
-
-47
-
-copies of evaluation structure separately from the more central
+immutable copies of evaluation structure separately from the more central
 aspects of $vau . For perspective, though, here is a derivation of
 copy-es-immutable .
 
-```
+```scheme
 ($define! copy-es-immutable
 
 ($lambda (object)
@@ -2631,9 +2588,7 @@ bindings for one environment are the same as those for (Cf. the
 rationale discussion for the derivation of library predicate $binds?,
 another.  §6.7.1.)
 
-48
-
-Type ignore is provided specifically for use in parameter matching;
+Type ignore is provided specifically for use in parameter matching;
 see §4.9.1, below.  (Contrast type inert, §4.5, also an encapsulated
 type with a single value, but provided specifically for non-use.)
 
@@ -2685,9 +2640,7 @@ environments is cyclic, the constructed environment will still check
 each of its parents at most once, and signal an error if no binding is
 found locally or in any of the parents.
 
-49
-
-As with the cons applicative (§4.6.3), the general laws governing
+As with the cons applicative (§4.6.3), the general laws governing
 mutation (§3.8) and eq? (§4.2.1) conspire to guarantee that the
 objects returned by two different calls to make-environment are not eq?
 .
@@ -2713,9 +2666,7 @@ environments.  Library features of the module will be described in
 Rationale:
 
 There is no need for this module to assume the Equivalence under
-mutation module,
-
-because environments are eq? iff they are equal? .
+mutation module, because environments are eq? iff they are equal? .
 
 It isn't clear to what extent one can do serious Kernel programming
 without mutating environments; but separating the mutators into an
@@ -2736,9 +2687,7 @@ non-comprehensive implementation from providing alternative means for
 doing some of the same things.
 
 For an example of the subtle interplay between environment mutation,
-recursion, and
-
-sequencing, see the derivation of $sequence , in §5.1.1.
+recursion, and sequencing, see the derivation of $sequence , in §5.1.1.
 
 #### 4.9.1 $define!
 
@@ -2777,10 +2726,7 @@ once. Thus, if a pair is reachable by more than one path, there must
 be no symbols reachable from it.
 
 Matching of a formal parameter tree t to an object o in an environment
-e proceeds
-
-recursively as follows. If the matching process fails, an error is
-signaled.
+e proceeds recursively as follows. If the matching process fails, an error is signaled.
 
 • If t is a symbol, then t is bound to o in e.
 
@@ -2818,9 +2764,7 @@ divided. The preceding are all -ere Latin verbs, though. For -ire
 verbs the gerundive suffix is -iendum; hence, from definire to define,
 definiendum thing to be defined.
 
-51
-
-the uniform generalization of definiends expands the practical
+the uniform generalization of definiends expands the practical
 versatility of both. A case in point —as well as a notable effect in
 its own right— is the convergence of consequences by which uniform
 generalized definiends in Kernel eliminate the motivation for one of
@@ -2945,8 +2889,6 @@ All combiners are immutable. Two applicatives are eq? iff their
 underlying com- biners are eq? . However, eq? -ness of operatives is
 only constrained by the general
 
-53
-
 rules for eq?, §4.2.1, which leave considerable leeway for variation
 between imple- mentations. The only relevant constraints are, in fact,
 that eq? must be reﬂexive symmetric and transitive, and that
@@ -2979,23 +2921,17 @@ all of them.
 
 The primitive type predicate for type operative.
 
-#### 4.10.1
-
-operative?
+#### 4.10.1 operative?
 
 (operative? . objects)
 
-#### 4.10.2
-
-applicative?
+#### 4.10.2 applicative?
 
 (applicative? . objects)
 
 The primitive type predicate for type applicative.
 
-#### 4.10.3
-
-$vau
+#### 4.10.3 $vau
 
 ($vau <formals> heformali hexpri)
 
@@ -3013,18 +2949,13 @@ signaled.
 A vau expression evaluates to an operative; an operative created in
 this way is said to be compound. The environment in which the vau
 expression was evaluated is remembered as part of the compound
-operative, called the compound operative's
-
-54
-
-static environment. When the compound operative is later called with
-an object and an environment (as per §3.3), here called respectively
-the operand tree and the dynamic environment,
+operative, called the compound operative's static environment. When
+the compound operative is later called with an object and an
+environment (as per §3.3), here called respectively the operand tree
+and the dynamic environment,
 
 1. A new, initially empty environment is created, with the static
-   environment as
-
-its parent. This will be called the local environment.
+   environment as its parent. This will be called the local environment.
 
 2. A stored copy of the formal parameter tree <formals> is matched in
 the local environment to the operand tree, locally binding the symbols
@@ -3035,9 +2966,7 @@ is a symbol then that symbol is bound in the local environment to the
 dynamic environment.
 
 3. A stored copy of the expression hexpri is evaluated in the local
-   environment as
-
-a tail context (§3.10).
+   environment as a tail context (§3.10).
 
 (On the copying of objects <formals> and hexpri, see under
 Immutability, below.)
@@ -3079,12 +3008,8 @@ Immutability
 
 • heformali.
 
-55
-
-• An immutable copy of the evaluation structure of <formals>, as by
-  applicative
-
-copy-es-immutable (§4.7.2).
+• An immutable copy of the evaluation structure of <formals>, as by
+  applicative copy-es-immutable (§4.7.2).
 
 • An immutable copy of the evaluation structure of hexpri.
 
@@ -3751,11 +3676,7 @@ must evaluate to a combiner. If it evaluates to an operative, in the
 first expression hoperandsi will be passed to it unevaluated; but in
 the second expression, the operands are always evaluated. So these two
 expressions cannot be equivalent unless the first argument to apply is
-an
-
-66
-
-applicative, and the behavior of apply is defined such that a type
+an applicative, and the behavior of apply is defined such that a type
 error in the first argument must be signaled.
 
 Although the above equivalence is a useful litmus test for the
@@ -3812,9 +3733,7 @@ The expression
 
 ($cond (htesti . `<body>`) . hclausesi)
 
-67
-
-is equivalent to
+is equivalent to
 
 ($if htesti ($sequence . `<body>`) ($cond . hclausesi))
 
@@ -3935,11 +3854,7 @@ integers of the form (p n a c), where p, n, a, and c are,
 respectively, the number of pairs in, the number of nil objects in,
 the acyclic prefix length of, and the cycle length of, the improper
 list starting with object. n is either 0 or 1, a + c = p, and n and c
-cannot
-
-69
-
-both be non-zero. If c = 0, the improper list is acyclic; if n = 1,
+cannot both be non-zero. If c = 0, the improper list is acyclic; if n = 1,
 the improper list is a finite list; if n = c = 0, the improper list is
 not a list; if a = c = 0, object is not a pair. (Lists are defined in
 §3.9.)
@@ -3996,9 +3911,7 @@ using previously defined features, and number primitives (§12).
 
 (list n 0 k (- n k)) (aux (cdr kth) (+ k 1) nth n)))))
 
-70
-
-($if (pair? ls)
+($if (pair? ls)
 
 (aux ls 0 ls 0) (list 0 ($if (null? ls) 1 0) 0 0))))
 
@@ -4053,9 +3966,7 @@ previously defined features, and number primitives (§12).
 
 (list-tail (cdr ls) (- k 1)) ls)))
 
-71
-
-5.8 Pair mutation (optional)
+### 5.8 Pair mutation (optional)
 
 #### 5.8.1 encycle!
 
@@ -4113,9 +4024,7 @@ must all have the same length (§6.3.1). If lists is empty, or if all
 of its elements are not lists of the same length, an error is
 signaled.
 
-72
-
-The map applicative applies applicative element-wise to the elements
+The map applicative applies applicative element-wise to the elements
 of the lists in lists (i.e., applies it to a list of the first elements
 of the lists, to a list of the second elements of the lists, etc.),
 using the dynamic environment from which map was called, and returns a
@@ -4175,11 +4084,7 @@ ordinary applicative combinations, and ordinary applicative
 combinations can access their dynamic environments. apply, on the
 other hand, is principally a vehicle for calling applicatives
 abnormally, overriding the usual rule for argument evaluation. Hence,
-the programmer
-
-73
-
-who uses apply does not have an expectation of normalcy; in fact, in
+the programmer who uses apply does not have an expectation of normalcy; in fact, in
 derivations in this report, apply is rarely called without specifying
 its optional environment argument. The default behavior for apply is
 therefore treated as a conscious decision, by definition not an
@@ -4194,84 +4099,18 @@ well-behaved, always producing the same result when applied to the
 same arguments.
 
 As a simple example of the treatment of cyclic list metrics, consider
-mapping applica-
+mapping applicative + onto the following two cyclic lists.
 
-tive + onto the following two cyclic lists.
-
+```scheme
 ($define! x (list 1 2 3)) (append! x (cdr x)) ($define! y (list 1 2
 3)) (append! y (cddr y))
 
-x
-
-q
-
-q
-
-1
-
-q
-
-2
-
-q
-
-3
-
 ($define! z (map + x y))
-
-q
-
-q
-
-2
 
 x : (1 2 3 2 3 2 3 ...)  y : (1 2 3 3 3 3 3 ...)
 
 z : (2 4 6 5 6 5 6 ...)
-
-q
-
-y
-
-q
-
-q
-
-q
-
-q
-
-3
-
-q
-
-1
-
-q
-
-q
-
-2
-
-q
-
-z
-
-q
-
-q
-
-q
-
-4
-
-q
-
-6
-
-q
-
-5
+```
 
 The infinite sequences represented by these lists are:
 
@@ -4293,9 +4132,7 @@ elements while another does not, any behavior other than signaling an
 error is potentially unexpected, hence facilitates accidents (G3 of
 §0.1.2).
 
-74
-
-Having decided to disallow differently lengthed list arguments, we
+Having decided to disallow differently lengthed list arguments, we
 have the invariant that the length of the result list is the length of
 each of the list arguments; but then, if no list arguments are
 provided, there is no way to choose a result length that will be
@@ -4311,8 +4148,8 @@ and number features (§12; not all are primitive, but there is no
 circular dependency). Note that this is, easily, the most complicated
 derivation in the language core.
 
+```scheme
 ($define! map
-
 (wrap ($vau (appv . lss) env
 
 ($define! acc
@@ -4359,6 +4196,7 @@ k2) j2) (lcm j2 k2)))))))
 (enlist lss
 
 result-metrics ($lambda (lss) (apply appv (cars lss) env)) cdrs))))
+```
 
 This applicative cannot be constructed using $lambda , because it
 needs to access its dynamic environment.
@@ -4405,25 +4243,27 @@ map has been implemented, everything else is "easy".
 
 #### 5.10.1 $let
 
+```
 ($let hbindingsi . <objects>)
+```
 
-76
+hbindingsi should be a finite list of formal-parameter-tree/expression
+pairings, each of the form (<formals> hexpressioni), where each
+<formals> is a formal parameter tree as described for the $define!
+operative, §4.9.1, and no symbol occurs in more than one of the
+<formals>.
 
-hbindingsi should be a finite list of
-formal-parameter-tree/expression pairings, each of the form (<formals>
-hexpressioni), where each <formals> is a formal parameter tree as
-described for the $define! operative, §4.9.1, and no symbol occurs in
-more than one of the <formals>.
-
+```
 ($let ((hform1i hexp1i) ...
 
 (hformni hexpni)) . <objects>)
+```
 
-The expression
+The expression is equivalent to
 
-is equivalent to
-
+```
 (($lambda (hform1i ... hformni) . <objects>) hexp1i ... hexpni)
+```
 
 Thus, the hexpki are first evaluated in the dynamic environment, in any
 order; then a child environment e of the dynamic environment is
@@ -4467,17 +4307,17 @@ Derivation
 The following expression defines $let using only previously defined
 features.
 
+```
 ($define! $let
 
 ($vau (bindings . body) env
 
 (eval (cons (list* $lambda (map car bindings) body)
 
-77
-
-(map cadr bindings))
+(map cadr bindings))
 
 env)))
+```
 
 Rationale:
 
@@ -4527,8 +4367,6 @@ previously defined features.
 
 Applicative and? is a predicate that returns true unless one or more
 of its argu-
-
-78
 
 Rationale:
 
@@ -4594,8 +4432,6 @@ previously defined features.
 
 (not? (apply and? (map not? x)))))
 
-79
-
 #### 6.1.4 $and?
 
 ($and? . <objects>)
@@ -4657,8 +4493,6 @@ Derivation
 #t)
 (eval (car x) e)) ; tail context (apply (wrap $and?) (cdr x) e))
 
-80
-
 (#t
 
 #f))))
@@ -4718,8 +4552,6 @@ Rationale:
 
 See the rationale for applicative and? (§6.1.2).
 
-81
-
 Derivation
 
 The following expression defines the combiner? applicative using only
@@ -4776,9 +4608,7 @@ returns the
 
 integer th element of list, zero-indexed.
 
-82
-
-Derivation
+Derivation
 
 The following expression defines the list-ref applicative, using
 previously defined features.
@@ -4840,9 +4670,7 @@ is guaranteed to signal an error if any lk is not an acyclic list, and
 returns an acyclic list with none of the same pairs as the original
 lists lk.
 
-83
-
-The following expression defines the append applicative, using only
+The following expression defines the append applicative, using only
 previously defined features.
 
 Derivation
@@ -4907,13 +4735,9 @@ Rationale:
 Helper applicative aux2 really ought to signal an error when its first
 argument is a cyclic list, because that could happen by accident; so,
 even though we don't usually do non-required error signaling in our
-expository library derivations, we would be tempted
-
-84
-
-to do so here, if not that it would depend on details of error
-handling that haven't been finalized yet in this revision of the
-report.
+expository library derivations, we would be tempted to do so here, if
+not that it would depend on details of error handling that haven't
+been finalized yet in this revision of the report.
 
 #### 6.3.4 list-neighbors
 
@@ -5037,8 +4861,6 @@ previously defined features.
 
 (apply append
 
-86
-
 (map ($lambda (x)
 
 ($if (apply accept? (list x))
@@ -5097,12 +4919,9 @@ several alternatives would be unsuitable.
 In most Lisp languages, the value returned by assoc to indicate
 failure is determined by the language policy for handling conditional
 test values. In those languages, arbitrary objects can be conditional
-test values, and all but one or a few designated values count
-
-87
-
-as true. By selecting a designated-false value as the value returned
-by assoc on failure, one can write
+test values, and all but one or a few designated values count as
+true. By selecting a designated-false value as the value returned by
+assoc on failure, one can write
 
 (let ((result (assoc key alist)))
 
@@ -5167,8 +4986,6 @@ alist)))
 
 (cons #f ()) (cons #t (car alist))))))
 
-88
-
 To use assoc*, one could then write
 
 ($let (((found . result) (assoc* key alist)))
@@ -5230,8 +5047,6 @@ represent nothing in a return value is thus seen to be neither
 arbitrary nor (in itself) ad hoc, but rather a natural consequence of
 the special status afforded to types pair and null by Kernel's matching
 algorithm (§4.9.1).
-
-89
 
 #### 6.3.7 member?
 
@@ -5359,13 +5174,10 @@ nonempty but acyclic, applicative reduce uses binary operation binary
 to merge all the elements of list into a single object, using any
 associative grouping of the elements. That is, the sequence of objects
 initially found in list is repeatedly decremented in length by
-applying binary to a list of any two consecutive objects,
-
-91
-
-replacing those two objects with the result at the point in the
-sequence where they occurred; and when the sequence contains only one
-object, that object is returned.
+applying binary to a list of any two consecutive objects, replacing
+those two objects with the result at the point in the sequence where
+they occurred; and when the sequence contains only one object, that
+object is returned.
 
 If list is cyclic, the second call syntax must be used. The elements
 of the cycle are passed, one at a time (but just once for each
@@ -5381,9 +5193,7 @@ needed (thus, parts of the reduction of the acyclic prefix may occur
 before the contribution from the cycle has been completed).
 
 Each call to binary, precycle, incycle, or postcycle uses the dynamic
-environment
-
-of the call to reduce .
+environment of the call to reduce .
 
 If list is acyclic with length n >= 1, binary is called n - 1 times. If
 list is cyclic with acyclic prefix length a and cycle length c, binary
@@ -5421,25 +5231,21 @@ will use and synthesize these facets; and postcycle will convert the
 reduced record back to a term of the type expected by binary.
 
 The applicative arguments are all called with the dynamic environment
-of the call to
-
-reduce by analogy with map (§5.9.1).
+of the call to reduce by analogy with map (§5.9.1).
 
 Two variant tools are under consideration (in a leisurely fashion, not
 to rush into vo- cabulary growth), reduce-left and reduce-right, which
 would use specific associative groupings and thus cater primarily to
-non-associative binary operations. Given a cyclic
-
-92
-
-list, reduce-left would perform the binary operation an unbounded
-number of times, while reduce-right would signal an error.
+non-associative binary operations. Given a cyclic list, reduce-left
+would perform the binary operation an unbounded number of times, while
+reduce-right would signal an error.
 
 The following expression defines reduce using only previously defined
 features.
 
 Derivation
 
+```scheme
 ($define! reduce
 
 ($let ()
@@ -5488,17 +5294,18 @@ in c)))
 
 ($if (=? a 0)
 
-93
+reduced-cycle (bin (reduce-n ls bin a)
 
-reduced-cycle (bin (reduce-n ls bin a)
-
-reduced-cycle)))))))))
+                   reduced-cycle)))))))))
+```
 
 ### 6.4 Pair mutation (optional)
 
 #### 6.4.1 append!
 
+```scheme
 (append! . lists)
+```
 
 lists must be a nonempty list; its first element must be an acyclic
 nonempty list, and all of its elements except the last element (if
@@ -5511,7 +5318,7 @@ It is an error for any two of the list arguments to have the same last
 pair.  The result returned by this applicative is inert.  The
 following equivalences hold.
 
-```
+```scheme
 (append! v ) === #inert
 
 (append! u v . w ) === ($sequence (append! u v )
@@ -5596,6 +5403,7 @@ features.
 
 Derivation
 
+```
 ($define! copy-es ($lambda (x)
 
 ($define! aux
@@ -5610,8 +5418,6 @@ Derivation
 
 (list (cdr record) alist)
 
-95
-
 ($let ((y (cons () ())))
 
 ($let ((alist (cons (cons x y) alist)))
@@ -5623,6 +5429,7 @@ Derivation
 (set-cdr! y z) (list y alist))))))))))
 
 (car (aux x ()))))
+```
 
 The depth of nesting of this code could be greatly reduced if
 operative $let* (§6.7.4) were available; one could rewrite the
@@ -5648,7 +5455,9 @@ time using temporary marks.
 
 #### 6.4.3 assq
 
+```
 (assq object pairs)
+```
 
 Rationale:
 
@@ -5666,9 +5475,8 @@ rationale discussion for assoc , §6.3.6.
 The following expression defines the assoc applicative, using only
 previously defined features.
 
-96
-
-($define! assq
+```
+($define! assq
 
 ($lambda (object alist)
 
@@ -5681,10 +5489,13 @@ alist)))
 ($if (null? alist)
 
 () (car alist)))))
+```
 
 #### 6.4.4 memq?
 
+```
 (memq? object list)
+```
 
 to object.
 
@@ -5698,6 +5509,7 @@ list is eq?
 The following expression defines the memq? applicative, using only
 previously defined features.
 
+```
 ($define! memq?
 
 ($lambda (object ls)
@@ -5707,18 +5519,19 @@ previously defined features.
 (map ($lambda (x) (eq? object x))
 
 ls))))
+```
 
 ### 6.5 Equivalence under mutation (optional)
 
 #### 6.5.1 eq?
 
+```
 (eq? . objects)
+```
 
 This applicative generalizes primitive predicate eq? (§4.2.1) to zero
 or more ar- It is a predicate that returns true unless some two of its
-arguments are
-
-guments.  different as judged by the primitive predicate.
+arguments areguments.  different as judged by the primitive predicate.
 
 Rationale:
 
@@ -5731,14 +5544,12 @@ discussion in §3.9).
 Returning true on zero or one arguments is deemed the most uniform,
 hence least error-prone, behavior for those cases. One measure of its
 uniformity is that it allows the entire behavior of the applicative,
-including the zero/one-argument cases, to be captured
-
-97
-
-by a very simple statement (above; cf. the behavioral statement for
+including the zero/one-argument cases, to be captured by a very simple statement (above; cf. the behavioral statement for
 and?, §6.1.2). Another is that it preserves the following implication:
 
+```
 (eq? h . t) => (eq? . t)
+```
 
 Derivation
 
@@ -5748,6 +5559,7 @@ previously defined features — notably get-list-metrics— use binary eq?
 , creating hidden circularities when eq? is rebound to the library
 applicative.)
 
+```
 ($define! eq?
 
 ($let ((old-eq?  ($lambda x
@@ -5761,12 +5573,15 @@ eq?))
 (map ($lambda (x) (apply old-eq? x))
 
 (list-neighbors x)))))))
+```
 
 ### 6.6 Equivalence up to mutation
 
 #### 6.6.1 equal?
 
+```
 (equal? . objects)
+```
 
 See the rationale for library eq?, §6.5.1.
 
@@ -5785,6 +5600,7 @@ special provisions are taken, as with library eq?, §6.5.1, to truncate
 any hidden circularities induced by previously defined features using
 binary equal? .)
 
+```
 ($define! equal?
 
 ($let ((old-equal?
@@ -5793,21 +5609,22 @@ equal?))
 
 ($lambda x
 
-98
-
 ($if ($and? (pair? x) (pair? (cdr x)) (null? (cddr x)))
 
-(apply old-equal? x) (apply and?
+(apply old-equal? x) (apply and?
 
 (map ($lambda (x) (apply old-equal? x))
 
 (list-neighbors x)))))))
+```
 
 ### 6.7 Environments
 
 #### 6.7.1 $binds?
 
+```
 ($binds? <exp> . hsymbolsi)
+```
 
 Operative $binds? evaluates <exp> in the dynamic environment; call the
 result env . env must be an environment. The operative is a predicate
@@ -5891,7 +5708,9 @@ false in any cases where predicate eq? returns true.
 
 #### 6.7.2 get-current-environment
 
+```
 (get-current-environment)
+```
 
 which it is called.
 
@@ -5919,9 +5738,7 @@ preventing accidents (G3 of §0.1.2), the names of zero-ary combiners
 are always verbs. Hence, in this case, get-current-environment rather
 than simply current-environment.
 
-100
-
-Derivation
+Derivation
 
 The following expression defines get-current-environment using only
 previously defined features.
@@ -5974,9 +5791,7 @@ and the expression
 
 ($let* ((hformi <exp>) . hbindingsi) . `<body>`)
 
-101
-
-is equivalent to
+is equivalent to
 
 Rationale:
 
@@ -6032,9 +5847,7 @@ is equivalent to
 
 . `<body>`)
 
-102
-
-Rationale:
+Rationale:
 
 The $letrec operative provides a different combination of capabilities
 and constraints than the other operatives in the $let family (on which
@@ -6092,9 +5905,8 @@ is equivalent to
 
 ($letrec ((hformi <exp>)) ($letrec* hbindingsi . `<body>`))
 
-103
 
-Rationale:
+Rationale:
 
 The $letrec* operative provides a different combination of capabilities
 and con- straints than do the other operatives in the $let family (on
@@ -6209,8 +6021,6 @@ one's source code.
 This is a common case of $let-redirect ; providing a shorthand for it
 unclutters
 
-105
-
 Derivation
 
 The following expression defines $let-safe using only previously defined
@@ -6270,9 +6080,7 @@ is equivalent to
 
 (get-current-environment))
 
-106
-
-Rationale:
+Rationale:
 
 Operative $bindings->environment provides a convenient way to
 construct a first- class environment containing computed bindings for a
@@ -6511,10 +6319,7 @@ is equivalent to
 lists must be a nonempty list of lists; if there are two or more, they
 should all be the same length. If lists is empty, or if all of its
 elements are not lists of the same length, an error is signaled.
-
-110
-
-for-each behaves identically to map, except that instead of
+for-each behaves identically to map, except that instead of
 accumulating and returning a list of the results of the element-wise
 applications, the results of the applications are discarded and the
 result returned by for-each is inert.
@@ -6570,10 +6375,7 @@ return of values to continuations, which was mentioned above, and
 which will be discussed below in In the simplest case, the abnormally
 passed value arrives at c as if it had §7.1).  been normally returned
 to c.  In general, continuations bypassed by the abnormal
-
-111
-
-pass may have entry/exit guards attached to them, and these guards
+pass may have entry/exit guards attached to them, and these guards
 can intercept the abnormal pass before it reaches c. Each entry/exit
 guard consists of a selector continuation, which designates which
 abnormal passes the guard will intercept, and an interceptor
@@ -6582,9 +6384,7 @@ and 7.2.5 (applicatives guard-continuation and
 continuation->applicative).
 
 Continuations are immutable, and are equal? iff eq? . The continuation
-type is
-
-encapsulated.
+type is encapsulated.
 
 Rationale:
 
@@ -6635,11 +6435,7 @@ case from evaluator calls. Each operative call is initiated by the
 evaluator because the object being evaluated is a combination whose
 combiner is that operative (evaluator Step 3a in §3.3); and since the
 result of the operative call will become the result of the evaluator
-call, the
-
-112
-
-continuation provided to the operative call is just the continuation
+call, the continuation provided to the operative call is just the continuation
 provided to the evaluator call. In effect, the operative call is a suffix
 of the processing of the evaluator call.
 
@@ -6694,8 +6490,6 @@ extended), which in a manifestly typed language would be accomplished
 via programmer-defined subtyping, is supported in Kernel by
 applicatives extend-continuation and guard-continuation (§§7.2.3,
 7.2.4).
-
-113
 
 ### 7.2 Primitive features
 
@@ -6752,8 +6546,6 @@ be renaming it to call-with-current-continuation?
 
 (extend-continuation continuation applicative environment)
 (extend-continuation continuation applicative)
-
-114
 
 When the first syntax is used, the extend-continuation applicative
 constructs and returns a new child of continuation that, when it
@@ -6893,8 +6685,6 @@ still be evaluated outside the jurisdiction of the interceptor; so we
 don't allow the interceptor to be multiply wrapped, and leave it to
 the interceptor to explicitly call eval at its discretion.
 
-116
-
 #### 7.2.5 continuation->applicative
 
 (continuation->applicative continuation)
@@ -6951,8 +6741,6 @@ grounds that it treats continuations as a special case — a conclusion
 that is subtly affirmed by its fostering of the illusion of
 multiple-value returns (on which see, again, the rationale discussion
 of §4.9.1.)
-
-117
 
 Selection
 
@@ -7016,11 +6804,7 @@ rethrown) at no more than one catch clause for each try.
 
 The handling of entry guards is ruthlessly symmetric to that of exit
 guards. Languages with type-based exception hierarchies have no clear
-analog to Kernel's entry guards, which
-
-118
-
-occur as a concept only because the hierarchy of exception
+analog to Kernel's entry guards, which occur as a concept only because the hierarchy of exception
 destinations is alike in kind to the hierarchy of exception sources;
 there is therefore, within the author's experience, no precedent for
 the entry-guard facility, and its design is based entirely on the
@@ -7081,9 +6865,7 @@ additional continuation is then constructed to normally receive the
 value that was abnormally passed, and initiate the first interceptor
 call.
 
-119
-
-Rationale:
+Rationale:
 
 In making the design of Kernel extent guarding work smoothly, a key
 insight was that, when an abnormal pass occurs, all the consequent
@@ -7146,11 +6928,7 @@ procedure dynamic-wind , which unconditionally intercepts all
 entry/exit of its dynamic extent.  The R5RS doesn't fully define how
 dynamic-wind interacts with first-class continuations (specifically,
 what happens when a continuation is captured from inside an
-interceptor),
-
-120
-
-and says nothing about how dynamic-wind interacts with
+interceptor), and says nothing about how dynamic-wind interacts with
 error-signaling. For perspec- tive, here is a Kernel implementation of
 dynamic-wind .
 
@@ -7210,11 +6988,7 @@ loop).
 When this continuation normally receives a value, it provides a
 diagnostic mes- sage to the user of the Kernel system, on the
 assumption that the received value is an attempt to describe some
-error that aborted a computation; and then resumes
-
-121
-
-operation of the Kernel system at some point that is outside of all
+error that aborted a computation; and then resumes operation of the Kernel system at some point that is outside of all
 user-defined com- putation. (For example, if the system is running a
 read-eval-print loop, operation may resume by continuing from the top
 of the loop.)
@@ -7277,8 +7051,6 @@ using only previously defined features.
 ($lambda (c o)
 
 (apply (continuation->applicative c) o)))
-
-122
 
 #### 7.3.2 $let/cc
 
@@ -7399,8 +7171,6 @@ guard, making bypass, and local, available for garbage collection.)
 
 (exit)
 
-124
-
 Applicative exit initiates an abnormal transfer of `#inert` to
   root-continuation
 
@@ -7513,9 +7283,7 @@ value. The value may be the result of an arbitrary computation that
 will not be performed until the value must be determined (constructor
 $lazy, §9.1.3); or, in advanced usage, the
 
-126
-
-value may be determined before the promise is constructed
+value may be determined before the promise is constructed
 (constructor memoize , §9.1.4).
 
 The value determined by a promise is obtained by forcing it
@@ -7572,8 +7340,6 @@ of equal? to that of eq? .
 (promise? . objects)
 
 The primitive type predicate for type promise.
-
-127
 
 A library derivation of this combiner will be provided as part of
   the derivation in
@@ -7635,8 +7401,6 @@ Rationale:
 In SRFI-45, promise constructor lazy (which is a macro) requires the
 programmer to guarantee that when its operand is eventually evaluated
 in the dynamic environment
-
-128
 
 where it was constructed, the result of the evaluation will be a
 promise. This is necessary because if the result is an undetermined
@@ -7704,8 +7468,6 @@ post-finalization update.
 that it explic- itly requires each forced evaluation, once initiated,
 to complete even after a value has
 
-129
-
 already been determined despite the fact that the result of that
 completion will certainly be discarded. This clarifies the phrasing in
 the R5RS , which so strongly emphasized determination of values that
@@ -7766,8 +7528,6 @@ object (handle-promise-result x (eval object env))))))
 (set-car! (car x) y) (set-cdr! (car x) ())
 
 ; ; memoize
-
-130
 
 y)
 
@@ -7842,8 +7602,6 @@ count ($sequence
 ($set! self count (- count 1)) (force p) ($set! self count (+ count
 2)) count))))))
 
-131
-
 Following these definitions,
 
 (get-count) (force p) (get-count)
@@ -7906,8 +7664,6 @@ v ($let ((s (stream-filter p? (cdr v))))
 
 ($if (p? (car v))
 
-132
-
 (cons (car v) s) s)))))))
 
 ($define! from
@@ -7966,8 +7722,6 @@ was provided as part of the derivation in
 
 A basic right of first-class objects is the right to be the result of a
 general computation
-
-133
 
 (§B); and promises are supposed to represent the potential to do
 general computation.  So if there were some particular type t of
@@ -8031,8 +7785,6 @@ Now, forcing the result will again evaluate (stream-ref s k), but the
 value returned is memoized, and the memoizing promise is iteratively
 forced — so that the final result of forcing the promise is the
 k-indexed element of the stream even if that element is a promise.
-
-134
 
 In SRFI-45, a constructor of promises substantially identical to
 memoize is called eager. Because SRFI-45 lacks a type predicate
@@ -8387,8 +8139,6 @@ This section describes the required Numbers module and five optional
 modules that assume it. Module Numbers supports type number and its
 subtype integer ; between
 
-140
-
 them, the five optional modules define another five subtypes of number
 (including subtype exact, which is defined by module Inexact but
 contains just those numbers that would be supported without that
@@ -8450,9 +8200,7 @@ through explicit design
 13The R5RS abstract treatment of numbers dates back to the R2RS ,
 [Cl85].
 
-141
-
-principles (a lesser echo of the overall Kernel design
+principles (a lesser echo of the overall Kernel design
 strategy). Kernel admits ﬂexibility for problem-domain-driven
 variations in internal number formats, but seeks to avoid rampant
 non-portability by disallowing variations that would be merely
@@ -8515,9 +8263,7 @@ Integers and infinities are included in required module Numbers because
 they are needed for the core modules, e.g. length (§6.3.1). Module
 Complex assumes module
 
-142
-
-Real because both rectangular and polar accessors are provided, so
+Real because both rectangular and polar accessors are provided, so
 that trigonometry is involved even if only Gaussian integers are
 constructed. It would seem a daunting task to implement module Real
 without module Inexact, but in case someone has a reason to do so, the
@@ -8572,9 +8318,7 @@ primary value and upper and lower bounds. When an arithmetic operation
 in module Numbers or Rational is given only exact arguments, the
 result of the operation must be exact.
 
-143
-
-When any real arithmetic operation is performed ("real" in the sense
+When any real arithmetic operation is performed ("real" in the sense
   of real ar-
 
 guments and real result),
@@ -8630,9 +8374,7 @@ bounding and robustness information, through the narrow-arithmetic
 keyed dynamic variable (§12.7.1). Module Narrow inexact assumes module
 Inexact.
 
-144
-
-If an operation on numeric arguments depends on their values to
+If an operation on numeric arguments depends on their values to
 determine behav- ior other than a numeric result, and the operation is
 given a numeric argument with no primary value, the operation signals
 an error. (As earlier, a complex argument is treated here as if it
@@ -8692,9 +8434,7 @@ signal. In the case of predicates on numbers, such as numeric
 comparisons (=?, §12.5.2, etc.), one might be tempted to handle lack
 of primary argument value by
 
-145
-
-simply returning false; however, the use of such predicates on
+simply returning false; however, the use of such predicates on
 inexact numbers is already, by nature, a guess based on best
 information available, and lack of a primary value means that the best
 information available indicates that the question has no answer
@@ -8753,9 +8493,7 @@ must normalize the point when writeing the infinity, so as not to
 reveal anything about eq? numbers that couldn't be determined without
 write (per §3.6).
 
-146
-
-Rationale:
+Rationale:
 
 Requiring that internal inexact complex numbers correspond with the
 constructors
@@ -8822,9 +8560,7 @@ sufficiently that, in principle, given exact arguments it has just one
 possible exact result (or is undefined). The operation usually isn't
 required to return this exact result, the largest class of exceptions
 
-147
-
-being features of modules Numbers and Rational; and the exact result
+being features of modules Numbers and Rational; and the exact result
 might not be internally representable by the implementation (if it is
 irrational, or a complex with an irrational component).
 
@@ -8879,9 +8615,7 @@ indicates which). An external represen- tation of an exact number
 completely determines the number, so that writeing an exact number z
 and then read ing what was written will produce an object eq? to z.
 
-148
-
-The external representation of an undefined number is #undefined. All
+The external representation of an undefined number is #undefined. All
   other
 
 rules for externally representing numbers pertain only to defined
@@ -8939,9 +8673,7 @@ For example, 2.3@8/3 represents a complex number with magnitude
 inexact 2.3 and angle exactly eight thirds. -0.7i represents a complex
 number with real part
 
-149
-
-exactly zero and imaginary part inexact negative seven tenths. 1.0+i
+exactly zero and imaginary part inexact negative seven tenths. 1.0+i
 represents a complex number with real part inexact positive one and
 imaginary part exact positive one.
 
@@ -8996,9 +8728,7 @@ subtype integer.  A real infinity is not an integer. A rational is an
 integer iff its denominator is one. An inexact real is an integer iff it
 has an integer primary value. A complex is an integer
 
-150
-
-iff its real part is an integer and its imaginary part has primary
+iff its real part is an integer and its imaginary part has primary
 value zero and upper and lower bounds zero.
 
 Rationale:
@@ -9060,9 +8790,7 @@ numerically equal. Because an infinity is viewed in arithmetic
 operations as a limit, one might suppose that the result of comparing
 two same-signed infinities is indeterminate, there being no
 
-151
-
-way to decide which limit approached infinity "faster". However, as
+way to decide which limit approached infinity "faster". However, as
 set out in the rationale discussion at the top of §12, an infinity is
 treated as a limit only to guide its arithmetic use. The design
 purpose of an infinity is to bound sets of finite reals — and in that
@@ -9113,9 +8841,7 @@ value.  If a complex number with magnitude infinity is added to another
 complex number with magnitude infinity, and they don't have the same
 angle, the result has no primary value.
 
-152
-
-If all the elements of a cycle are zero, the sum of the cycle is
+If all the elements of a cycle are zero, the sum of the cycle is
 zero. If the acyclic sum of the elements of a cycle (i.e., the sum of
 an acyclic list containing just those elements) is non-zero, the sum
 of the cycle is positive infinity times the acyclic sum of the
@@ -9167,9 +8893,7 @@ the sum of
 
 number with the negation of the sum of numbers.
 
-153
-
-Rationale:
+Rationale:
 
 The smooth behavior of applicative - on a single argument (i.e., if
 numbers is the empty list) would be to return that argument
@@ -9218,8 +8942,6 @@ which the R6RS provides its primary integer-division support through
 functions div, mod, div0, and mod0. Here we prefer the more well-
 behaved div etc. to the earlier procedures; the R6RS discusses its
 rationale for these functions in a separate document ([Sp+07]).
-
-154
 
 #### 12.5.9 div0, mod0, div0-and-mod0
 
@@ -9272,8 +8994,6 @@ in §12.2.
 The conditions and rationale for signaling an error on
 no-primary-value were discussed
 
-155
-
 #### 12.5.12 abs
 
 (abs real )
@@ -9324,9 +9044,7 @@ result is the same as if all zero and infinite arguments were deleted.
 
 k with n × n'
 
-156
-
-Rationale:
+Rationale:
 
 Positive infinity is an improper-integer multiple of every non-zero
 improper integer (by multiplying that non-zero improper integer by an
@@ -9383,9 +9101,7 @@ number, or a complex number all of whose rectangular components are
 robust. Applicative undefined? is a predicate that returns true iff
 every element of numbers is undefined.
 
-157
-
-Rationale:
+Rationale:
 
 Although none of these predicates are type predicates (because they
 don't take ar- bitrary objects as arguments), none of them depend on
@@ -9443,9 +9159,7 @@ is inexact with a primary value, applicative get-real-exact-primary
 returns an exact real number x0 within the exact bounds that would be
 returned for
 
-158
-
-real by applicative get-real-exact-bounds (§12.6.2). Preferably, x0
+real by applicative get-real-exact-bounds (§12.6.2). Preferably, x0
 should be as close to the primary value of real as the implementation
 can reasonably arrange. If the implementation does not support any
 exact real that reasonably approximates real , an error may be
@@ -9509,9 +9223,7 @@ and real3 via applicative get-real-internal-primary (§12.6.3).
 It would be possible to derive get-real-internal-primary from this
 applicative, by
 
-159
-
-($define! get-real-internal-primary
+($define! get-real-internal-primary
 
 ($lambda (x)
 
@@ -9557,8 +9269,6 @@ restrictive when the variable is true than when the variable is false.
 Rationale:
 
 See the rationale discussion in §12.2.
-
-160
 
 ### 12.8 Rational features
 
@@ -9615,7 +9325,6 @@ primary value, the denominator has upper bound positive infinity, and
 the numerator must have at least one infinite bound (two infinite bounds
 if the bounds of rational allow values of both signs).
 
-161
 
 #### 12.8.4 floor, ceiling, truncate, round
 
@@ -9667,9 +9376,7 @@ returns exact x0.  If one or both of real1 and real2 are inexact, the
 applicative returns an inexact rational approximating x0 (as by
 real->inexact , §12.6.5). Note that an inexact
 
-162
-
-result returned is not necessarily bounded by the primary values of
+result returned is not necessarily bounded by the primary values of
 the arguments; but the result is an approximation of x0, which is so
 bounded, and the bounds of the result include x0.
 
@@ -9720,8 +9427,6 @@ implementation.
 
 (exp number ) (log number )
 
-163
-
 #### 12.9.3 sin, cos, tan
 
 (sin number ) (cos number ) (tan number )
@@ -9758,8 +9463,6 @@ complex )
 make-polar, magnitude, angle
 
 (make-polar real1 real2 ) (magnitude number ) (angle complex )
-
-164
 
 ## 13 Strings
 
@@ -9816,8 +9519,6 @@ accessed implicitly within the dynamic extent of the call, and is
 automatically closed on normal return, it is possible for the
 programmer to use a port this way without ever once explicitly
 referencing it.
-
-165
 
 2. For somewhat more general i/o operations, call-with-input-file
 /call-with- output-file provides an explicit reference to the opened
@@ -9888,8 +9589,6 @@ close-input-file, close-output-file
 
 read
 
-166
-
 #### 15.2.1
 
 call-with-input-file, call-with-output-file
@@ -9954,9 +9653,7 @@ file(s), caution is needed when a module constructs facilities that use
 object identity for access control — such as, notably, encapsulated
 types (§8) or keyed dynamic/static variables (§§10,
 
-167
-
-11). A closely related issue is the ability to parameterize the
+11). A closely related issue is the ability to parameterize the
 loading process, which is the purpose of optional argument
 environment. Using an environment for this lends a degree of
 uniformity to the parameter-passing protocol; minimizes intrusion of
@@ -10001,7 +9698,7 @@ features.
 
 (eval (list load filename) env) env)))
 
-16 Formal syntax and semantics
+## 16 Formal syntax and semantics
 
 This section provides formal descriptions of what has already been
 described infor- mally in previous sections.
@@ -10016,9 +9713,7 @@ algorithm for classifying lexemes by token type. §16.1.3 presents a
 grammar for building tokens from sequences of characters (which
 formally subsumes
 
-168
-
-the contents of §§16.1.1–16.1.2). Finally, §16.1.4 presents a
+the contents of §§16.1.1–16.1.2). Finally, §16.1.4 presents a
 grammar for building expressions from sequences of tokens.
 
 The grammars use an extended BNF. All spaces in the grammars are for
@@ -10053,7 +9748,7 @@ characters, still without worrying about whether the entire lexeme is
 a syntactically correct token (§16.1.2). The detailed syntax of tokens
 is only needed after the token class is already known.
 
-16.1.1 Lexemes
+#### 16.1.1 Lexemes
 
 Here we describe an algorithm for dividing a sequence of characters
 into lexemes. The algorithm doesn't classify lexemes by type, not even
@@ -10136,9 +9831,7 @@ call-with-values; see §4.9.1).
 
 • First-class treatment of cyclic structures (§3.9).
 
-170
-
-• Exception handling via entry/exit guards (§7).
+• Exception handling via entry/exit guards (§7).
 
 • Real infinities, and exact upper and lower bounds on inexact reals.
 
@@ -10193,9 +9886,7 @@ $sequence and compound $vau . Improved phrasing, §1.3.3; expanded
 rationales, §4.9.1, §5.1.1. More content on numbers (including
 no-primary-value errors and point- projective form).
 
-171
-
-• 21 September 2009. Rationales, §1.3.7, §2, §3.8, §4.9.1,
+• 21 September 2009. Rationales, §1.3.7, §2, §3.8, §4.9.1,
 §5.4.1. Expanded index entry for "external representation". Some
 content on ports, notably get-module . Bug fix to derivation of
 append!, and small emendation to its description. Bug fix to
@@ -10247,8 +9938,6 @@ is not at all clear that any GUI strategy devised to date has the kind
 of elegance that Kernel aspires to; but as of this writing, the
 problem has not been subjected to a direct assault, so no alternative
 strategy for Kernel is yet under development.
-
-172
 
 ## B First-class objects
 
@@ -10317,9 +10006,7 @@ compromise on the elegance of a
 
 language design.
 
-173
-
-4. They may be components of data structures.
+4. They may be components of data structures.
 
 A significant omission from this list may be illustrated by the
 following thought experiment. Suppose Scheme were slightly modified, by
@@ -10379,9 +10066,7 @@ optional procedure interaction-environment is omitted) [KeClRe98,
 17A similar criterion for first-class objects was recommended by
 [Gu91].
 
-174
-
-Other kinds of second-class objects in Scheme, less basic to its
+Other kinds of second-class objects in Scheme, less basic to its
 evaluator algorithm, include multiple-value return sequences (see
 rationale discussion of §4.9.1), and cyclic list and tree structures
 (see rationale discussion of §3.9).
