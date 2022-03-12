@@ -2777,8 +2777,8 @@ error is signaled.
 > the more semantically baroque features of many Lisps: so-called
 > "multiple-value returns".
 
-[11] For the natural-linguistically curious: The suffix -end in English
-mathematical terms such as addend, dividend, etc., is a simple
+[11] For the natural-linguistically curious: The suffix -end in
+English mathematical terms such as addend, dividend, etc., is a simple
 shortening of the Latin gerundive suffix -endum. From addere to add,
 addendum thing to be added; from subtrahere to take away, subtrahendum
 thing to be taken away; dividere to divide, dividendum thing to be
@@ -2829,11 +2829,12 @@ rather than returning it first and then decomposing it in a separate
 operation. For example, one might call get-list-metrics (§5.7.1),
 which returns a list of four values, by:
 
+```scheme
 ($let (((p n a c) (get-list-metrics <exp>)))
+      <body>)
+```
 
-`<body>`)
-
-The $define! operative is most often used with a single symbol as
+The `$define!` operative is most often used with a single symbol as
 definiend, but the ability to use more general definiends at will
 sometimes considerably simplifies algorithmic expressions, and is
 occasionally quite powerful; see for example the derivation of $letrec
@@ -2887,9 +2888,11 @@ compound definiend is a template for combinations, with its operator
 being the simple definiend hsymboli, and its operands the formal
 parameters of an implicit lambda expression. Thus,
 
+```scheme
 (define (square x) (* x x))
 
-=> (define square (lambda (x) (* x x)))
+;; => (define square (lambda (x) (* x x)))
+```
 
 This syntactic sugar is, evidently, omitted from Kernel since it is
 incompatible with uni- form support of formal parameter trees.
@@ -2911,16 +2914,14 @@ operatives cannot be eq? if they can ever exhibit different
 behavior. The following expressions, for example, may evaluate to true
 or false depending on the implementation.
 
-```
+```scheme
 (eq? ($vau (x) #ignore x) ($vau (x) #ignore x)) (eq? ($vau (x) #ignore
 x) ($vau (y) #ignore y))
 ```
 
 Two combiners are equal? iff they are eq? (§§4.2.1, 4.3.1).  Library
 features associated with these types will be described in §§5.3, 5.5,
-5.9,
-
-and 6.2.
+5.9, and 6.2.
 
 Rationale:
 
@@ -2934,21 +2935,28 @@ general rules, if each of several operatives would immediately cause
 mutation when called, predicate equal?  would be permitted to equate
 all of them.
 
-The primitive type predicate for type operative.
 
 #### 4.10.1 operative?
 
+```
 (operative? . objects)
+```
+
+The primitive type predicate for type operative.
 
 #### 4.10.2 applicative?
 
+```scheme
 (applicative? . objects)
+```
 
 The primitive type predicate for type applicative.
 
 #### 4.10.3 $vau
 
+```scheme
 ($vau <formals> heformali hexpri)
+```
 
 <formals> should be a formal parameter tree, as described for the
 $define! op-
@@ -3187,9 +3195,8 @@ Derivation
 The following expression defines $sequence using only previously defined
 features (which at this point means only core primitives).
 
-```
+```scheme
 ($define! $sequence
-
 ((wrap ($vau ($seq2) #ignore
 
 ($seq2
@@ -3238,7 +3245,7 @@ if $let,
 $letrec, $lambda , and apply (§§5.10.1, 6.7.5, 5.3.2, 5.5.1) were
 available.
 
-```
+```scheme
 ($define! $sequence ($let (($seq2
 
 ($vau (first second) env
@@ -3272,7 +3279,7 @@ Rationale:
 
 Eager argument evaluation affords unencumbered sequencing: operative
 
-```
+```scheme
 ($vau (first second) env
 
 ((wrap ($vau #ignore #ignore (eval second env)))
@@ -3285,9 +3292,11 @@ evaluated sequentially in the dynamic environment, and the second
 result be returned. Sequencing can also be extracted from primitive
 operative $if, as via
 
+```scheme
 ($vau (first second) env
 
 (eval ($if (null? (eval first env)) second second) env))
+```
 
 but this carries the additional conceptual burden of requesting an
 irrelevant test on the result of the first operand evaluation.
@@ -3302,7 +3311,9 @@ against accidents (G3 of §0.1.2) in a language with side-effects.
 
 #### 5.2.1 list
 
+```scheme
 (list . objects)
+```
 
 The list applicative returns objects.  The underlying operative of
 list returns its undifferentiated operand tree, re- gardless of whether
@@ -3326,7 +3337,7 @@ Derivation
 The following expression defines the list applicative, using only
 previously defined features.
 
-```
+```scheme
 ($define! list (wrap ($vau x #ignore x)))
 ```
 
@@ -3334,47 +3345,59 @@ Recall that mutability of constructed argument lists is guaranteed by
 the evaluator algorithm (§3.3), thus providing the correct behavior
 for this derivation without need for explicit use of cons.
 
-60
+The implementation would be even simpler if $lambda (§5.3.2) were
+available:
 
-The implementation would be even simpler if $lambda (§5.3.2) were
-  available:
-
+```scheme
 ($define! list ($lambda x x))
+```
 
 objects should be a finite nonempty list of arguments. The following
 equivalences
 
+```scheme
 (list* arg1 ) (list* arg1 arg2 . args) === (cons arg1 (list* arg2
 . args))
+```
 
 === arg1
 
 #### 5.2.2 list*
 
+```scheme
 (list* . objects)
+```
 
 hold:
 
 For example,
 
+```scheme
 (list* 1) (list* 1 2) (list* 1 2 3) (list* 1 2 3 ())
+```
 
 Rationale:
 
+```scheme
 => 1 => (1 . 2) => (1 2 . 3) => (1 2 3)
+```
 
 It is fairly common —it happens several times in the library
 derivations in this report— that one wants to construct a list by
 prepending several elements onto the front of an existing list. We
 could write an expression such as
 
+```scheme
 (append (list x y z) list)
+```
 
 This is a rather indirect way to express the intended operation, since
 we really have no interest in constructing a list of the elements x,
 y, z. Alternatively, we could write
 
+```scheme
 (cons x (cons y (cons z list)))
+```
 
 This is more direct, but harder to read; we have lost sight of the
 unity of the overall operation we are performing.
@@ -3383,7 +3406,9 @@ R5RS Scheme provides a shorthand for such a construction in the
 special case that the intended use of the new list is to apply a
 procedure to it. The shorthand uses combinations of the form
 
+```scheme
 (apply proc x y z list)
+```
 
 From a Kernel design perspective, this shorthand has two basic
 drawbacks. It complicates the semantics of apply, thus lacks
@@ -3396,14 +3421,12 @@ list* requires a finite nonempty list of arguments because its behavior
 is defined by the way it treats its last argument differently (per the
 rationale discussion in §3.9; contrast applicative list, §5.2.1).
 
-61
-
-Derivation
+Derivation
 
 The following expression defines the list* applicative, using only
 previously defined features.
 
-```
+```scheme
 ($define! list*
 
 (wrap ($vau args #ignore
@@ -3422,7 +3445,7 @@ head (cons head (aux tail))))))
 This could be implemented more cleanly if $lambda (§5.3.2) and apply
 (§5.5.1) were available:
 
-```
+```scheme
 ($define! list*
 
 ($lambda (head . tail) ($if (null? tail)
@@ -3461,14 +3484,12 @@ is equivalent to
 
 ($vau hxi hyi ($sequence . hzi))
 
-62
-
-Derivation
+Derivation
 
 The following expression defines the $vau library operative using only
 previously defined features.
 
-```
+```scheme
 ($define! $vau
 
 ((wrap ($vau ($vau) #ignore
@@ -3487,7 +3508,7 @@ $vau))
 This could be implemented somewhat more cleanly if $let (§5.10.1) were
 available:
 
-```
+```scheme
 ($define! $vau
 
 ($let (($vau $vau)) ; save the primitive ($vau (formals eformal
@@ -3502,7 +3523,9 @@ env))))
 
 #### 5.3.2 $lambda
 
+```scheme
 ($lambda <formals> . <objects>)
+```
 
 §4.9.1.
 
@@ -3512,7 +3535,7 @@ is equivalent to
 
 Rationale:
 
-```
+```scheme
 ($lambda <formals> . <objects>)
 
 (wrap ($vau <formals> #ignore . <objects>))
@@ -3537,7 +3560,7 @@ example, §6.7.2.
 The following expression defines the $lambda operative, using only
 previously defined features.
 
-```
+```scheme
 ($define! $lambda
 
 ($vau (formals . body) env
@@ -3551,7 +3574,9 @@ env))))
 
 #### 5.4.1 car, cdr
 
-(car pair ) (cdr pair )
+```scheme
+(car pair) (cdr pair)
+```
 
 Rationale:
 
@@ -3586,14 +3611,16 @@ Derivation
 The following expressions define the car and cdr applicatives, using
 only previously defined features.
 
-```
-($define! car ($lambda ((x . #ignore)) x)) ($define! cdr ($lambda
-((#ignore . x)) x))
+```scheme
+($define! car ($lambda ((x . #ignore)) x))
+($define! cdr ($lambda ((#ignore . x)) x))
 ```
 
 ##### 5.4.2 caar, cadr, . . . cddddr
 
+```scheme
 (caar pair ) · · · (cddddr pair )
+```
 
 These applicatives are compositions of car and cdr , with the a's and
 d's in the same order as they would appear if all the individual car's
@@ -3629,7 +3656,7 @@ compositions, as follows.
 The more sophisticated alternative is to use deep formal parameter
 trees, as in the derivations of car and cdr in §5.4.1:
 
-```
+```scheme
 ($define! caar ($lambda (((x . #ignore) . #ignore)) x)) ($define! cadr
 ($lambda ((#ignore x . #ignore)) x)) · · · ($define! cddddr ($lambda
 
@@ -3641,31 +3668,43 @@ trees, as in the derivations of car and cdr in §5.4.1:
 
 #### 5.5.1 apply
 
-(apply applicative object environment) (apply applicative object)
+```scheme
+(apply applicative object environment)
+(apply applicative object)
+```
 
 When the first syntax is used, applicative apply combines the
 underlying com- biner of applicative with object in dynamic
 environment environment, as a tail con- text. The expression
 
+```scheme
 (apply applicative object environment)
+```
 
 is equivalent to
 
+```scheme
 (eval (cons (unwrap applicative) object) environment)
+```
 
 The second syntax is just syntactic sugar; the expression
 
+```scheme
 (apply applicative object)
+```
 
 is equivalent to
 
 Derivation
 
+```scheme
 (apply applicative object (make-environment))
+```
 
 The following expression defines apply using only previously defined
 features.
 
+```scheme
 ($define! apply
 
 ($lambda (appv arg . opt)
@@ -3675,6 +3714,7 @@ features.
 ($if (null? opt)
 
 (make-environment) (car opt)))))
+```
 
 Rationale:
 
@@ -3803,7 +3843,7 @@ Derivation
 The following expression defines the $cond operative, using only
 previously defined features.
 
-```
+```scheme
 ($define! $cond
 
 ($vau clauses env
@@ -3825,7 +3865,7 @@ previously defined features.
 The auxiliary applicative aux could be cleanly eliminated if $let
 (§5.10.1) were available:
 
-```
+```scheme
 ($define! $cond
 
 ($vau clauses env
@@ -3906,6 +3946,7 @@ Derivation
 The following expression defines the get-list-metrics applicative,
 using previously defined features, and number primitives (§12).
 
+```scheme
 ($define! get-list-metrics
 
 ($lambda (ls)
@@ -3929,6 +3970,7 @@ using previously defined features, and number primitives (§12).
 ($if (pair? ls)
 
 (aux ls 0 ls 0) (list 0 ($if (null? ls) 1 0) 0 0))))
+```
 
 Rationale:
 
@@ -3956,23 +3998,25 @@ can make writing memory much more expensive than reading it.
 
 #### 5.7.2 list-tail
 
+```scheme
 (list-tail object integer )
+```
 
 integer should be exact and non-negative. The list-tail applicative
 follows integer cdr references starting from object. Thus, object must
 be the start of an improper list containing at least integer
 pairs. The following equivalences hold:
 
-(list-tail object 0) (list-tail object (+ k 1)) === (list-tail (cdr
-object) k)
-
-=== object
+```scheme
+(list-tail object 0) (list-tail object (+ k 1)) === (list-tail (cdr object) k) === object
+```
 
 Derivation
 
 The following expression defines the list-tail applicative, using
 previously defined features, and number primitives (§12).
 
+```scheme
 ($define! list-tail
 
 ($lambda (ls k)
@@ -3980,12 +4024,15 @@ previously defined features, and number primitives (§12).
 ($if (>? k 0)
 
 (list-tail (cdr ls) (- k 1)) ls)))
+```
 
 ### 5.8 Pair mutation (optional)
 
 #### 5.8.1 encycle!
 
+```scheme
 (encycle! object integer1 integer2 )
+```
 
 integer1 and integer2 should be exact and non-negative. The improper
 list start-
@@ -4018,21 +4065,21 @@ Derivation
 The following expression defines the encycle! applicative, using
 previously defined features, and number primitives (§12).
 
-```
+```scheme
 ($define! encycle!
-
-($lambda (ls k1 k2) ($if (>? k2 0)
-
-(set-cdr! (list-tail ls (+ k1 k2 -1)) (list-tail ls k1))
-
-#inert)))
+          ($lambda (ls k1 k2)
+                   ($if (>? k2 0)
+                        (set-cdr! (list-tail ls (+ k1 k2 -1)) (list-tail ls k1))
+                                   #inert)))
 ```
 
 ### 5.9 Combiners
 
 #### 5.9.1 map
 
+```scheme
 (map applicative . lists)
+```
 
 lists must be a nonempty list of lists; if there are two or more, they
 must all have the same length (§6.3.1). If lists is empty, or if all
@@ -4064,6 +4111,7 @@ expressions, for n > 0 and m >= 0.
 The map applicative is designed to guarantee equivalence between the
 following two
 
+```scheme
 (map c (list a1,1 . . . a1,m)
 
 ...
@@ -4075,6 +4123,7 @@ following two
 (list (c a1,1 . . . an,1 ) ...
 
 (c a1,m . . . an,m))
+```
 
 This equivalence implies that the first argument to map must be an
 applicative, never an operative, by the same reasoning as for apply,
@@ -4088,7 +4137,9 @@ conceivable event that the programmer wants to combine an operative
 element-wise with the elements of one or more lists, this effect is
 readily achieved by simply wrapping the operative, thus:
 
+```scheme
 (map (wrap operative) . lists)
+```
 
 The treatment of dynamic environments differs from that of apply . Both
 behaviors are based on the governing principle of accident avoidance
@@ -4258,7 +4309,7 @@ map has been implemented, everything else is "easy".
 
 #### 5.10.1 $let
 
-```
+```scheme
 ($let hbindingsi . <objects>)
 ```
 
@@ -4268,15 +4319,14 @@ pairings, each of the form (<formals> hexpressioni), where each
 operative, §4.9.1, and no symbol occurs in more than one of the
 <formals>.
 
-```
+```scheme
 ($let ((hform1i hexp1i) ...
-
-(hformni hexpni)) . <objects>)
+       (hformni hexpni)) . <objects>)
 ```
 
 The expression is equivalent to
 
-```
+```scheme
 (($lambda (hform1i ... hformni) . <objects>) hexp1i ... hexpni)
 ```
 
@@ -4322,7 +4372,7 @@ Derivation
 The following expression defines $let using only previously defined
 features.
 
-```
+```scheme
 ($define! $let
 
 ($vau (bindings . body) env
@@ -4383,7 +4433,7 @@ previously defined features.
 Applicative and? is a predicate that returns true unless one or more
 of its argu-
 
-Rationale:
+Rationale:
 
 Because and? doesn't process its arguments in any particular order, it
 must terminate
@@ -4398,13 +4448,16 @@ including the zero-argument case, to be captured by a very simple
 statement (above). Another is that that it preserves the following
 equivalence:
 
+```scheme
 (and? h . t) === (and? h (and? . t))
+```
 
 Derivation
 
 The following expression defines the and? applicative, using only
 previously defined features.
 
+```scheme
 ($define! and?
 
 ($lambda x
@@ -4422,10 +4475,13 @@ previously defined features.
 #f))))
 
 (aux x (car (get-list-metrics x)))))
+```
 
 #### 6.1.3 or?
 
+```scheme
 (or? . booleans)
+```
 
 ments are true.
 
