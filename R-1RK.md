@@ -279,9 +279,6 @@ Massachusetts, 01609-2280
 - [C De-trivializing the theory of fexprs](#c-de-trivializing-the-theory-of-fexprs)
 - [References](#references)
 
-<!-- markdown-toc end -->
-
-
 ## 0 - Introduction
 
 The Kernel programming language is a statically scoped and properly
@@ -451,7 +448,7 @@ apply directly to specific tactical design decisions (as called for in
 - G3 [usability] Dangerous computation behaviors (e.g., hygiene
   violations [2]), while permitted on general principle, should be
   difficult to program by accident.
-  
+
   [2] Kernel hygiene is discussed in [Sh09, Ch. 5].
 
   Guideline G3 was formulated specifically to protect the ideal of
@@ -1095,7 +1092,7 @@ bofoc, orange bofod, yellow bofof, green bofog, and so on.) Ro was
 sponsored for some years by, among others, Doctor Melvil Dewey,
 creator of the Dewey Decimal System.
 
-[7] On the desirability of generic operations, see [Sus07].  
+[7] On the desirability of generic operations, see [Sus07].
 
 ## 2 Lexemes
 
@@ -1223,8 +1220,8 @@ For a description of the notations used for numbers, see §12.
 - " The double-quote character is used to delimit strings (§13).
 
 - \ Backslash is used in the syntax for character constants (§14) and
-  as an escape character within string constants (§13). 
-  
+  as an escape character within string constants (§13).
+
 - # Sharp sign is used for a variety of purposes depending on the
   character that immediately follows it:
 
@@ -1350,16 +1347,18 @@ because, as evaluations proceed, it may be mutated).
 
 2. If `o` is a symbol, the evaluator returns the value bound by `o` in `e`.
 
-3. Otherwise, `o` is a pair. Let `a` and `d` be the `car` and `cdr` of `o`. `a` is evaluated in `e`; call its result `f`.
+3. Otherwise, `o` is a pair. Let `a` and `d` be the `car` and `cdr` of
+   `o`. `a` is evaluated in `e`; call its result `f`.
 
-- (a) If `f` is an operative, then `f` is called with input object `d` and
-  input environment `e`, and the result is the result of the combination.
+    - (a) If `f` is an operative, then `f` is called with input object
+      `d` and input environment `e`, and the result is the result of
+      the combination.
 
-- (b) Otherwise, `f` must be an applicative, and `d` must be a list
-  (§3.9). Let `f'` be the underlying combiner of `f` . The elements of
-  list `d` are evaluated in `e`; let `d'` be a list of their values. The
-  cons of `f'` with `d'` is evaluated in `e`, and the result is the
-  result of the combination.
+    - (b) Otherwise, `f` must be an applicative, and `d` must be a
+      list (§3.9). Let `f'` be the underlying combiner of `f` . The
+      elements of list `d` are evaluated in `e`; let `d'` be a list of
+      their values. The cons of `f'` with `d'` is evaluated in `e`,
+      and the result is the result of the combination.
 
 In Step 2, if o is not bound in e, an error is signaled. In Step 3, if
 f is neither an applicative nor an operative, an error is signaled. In
@@ -1512,7 +1511,7 @@ centrally, read §15.1.7, write §15.1.8, eq? §4.2.1, and equal? §4.3.1.
 > explicit meta-circular evaluator, may be straightforwardly achieved
 > in Kernel by applying the built-in evaluator algorithm with a
 > different environment.
-g
+
 ### 3.5 Partitioning of types
 
 In each module, certain of its primitive applicatives are identified as
@@ -1763,7 +1762,7 @@ chain of internal references, one can get to o. For example, one could
 create a self-referencing list by evaluating the sequence:
 
 ```scheme
-($define! foo (list 1 2 3)) 
+($define! foo (list 1 2 3))
 (append! foo foo)
 ```
 
@@ -2187,50 +2186,47 @@ described in this report will be uniquely determined, modulo the
 behavior of eq?, by further constraints as necessary in the
 description of the type.
 
-1 The equal? predicate must be reﬂexive, symmetric, and transitive.
+1. The equal? predicate must be reﬂexive, symmetric, and transitive.
 
-2 If eq? would return true, equal? must return true.
+2. If eq? would return true, equal? must return true.
 
-3 If the two objects (object1 and object2 ) are non-interchangeable
-in any way that could affect the behavior of a Kernel program that (a)
-performs no mutation and (b) doesn't use eq? (neither directly nor
-indirectly), then equal? must return false. For example:
+3. If the two objects (object1 and object2 ) are non-interchangeable
+   in any way that could affect the behavior of a Kernel program that
+   (a) performs no mutation and (b) doesn't use eq? (neither directly
+   nor indirectly), then equal? must return false. For example:
 
-– If the two objects are observably not of the same type, equal? must
-return
+    - If the two objects are observably not of the same type, equal?
+      must return false.
 
-– If the objects have different external representations, equal? must
-return
+    - If the objects have different external representations, equal?
+      must return false.
 
-false.
 
-false.
+    - If the objects are both numbers, and numerically equal, but have
+      different inexactness bounds (e.g., one is exact and the other
+      isn't; §12.2), equal?  must return false.
 
-– If the objects are both numbers, and numerically equal, but have
-different inexactness bounds (e.g., one is exact and the other isn't;
-§12.2), equal?  must return false.
+4. If equal? is not required to return false by the preceding rule,
+   and this fact can be determined with certainty by a (correct)
+   Kernel program that (a) is independent of the objects (they don't
+   refer to it and it only refers to them as parameters), (b) examines
+   the objects only passively (doesn't use them or parts of them as
+   combiners in evaluation), (c) performs no mutation, and (d) always
+   terminates (provided the quantity of actual data within the runtime
+   system is finite), then equal? must return true. For example,
 
-4 If equal? is not required to return false by the preceding rule, and
-this fact can be determined with certainty by a (correct) Kernel
-program that (a) is independent of the objects (they don't refer to it
-and it only refers to them as parameters), (b) examines the objects
-only passively (doesn't use them or parts of them as combiners in
-evaluation), (c) performs no mutation, and (d) always terminates
-(provided the quantity of actual data within the runtime system is
-finite), then equal? must return true. For example,
+    - Suppose variables x and y are set up by evaluating the following
+      sequence of expressions.
 
-– Suppose variables x and y are set up by evaluating the following
-sequence of expressions.
+    ```scheme
+    ($define! x (list 1)) ($define! y (list 1 1)) (append! x x) (append! y y)
+    ```
 
-```scheme
-($define! x (list 1)) ($define! y (list 1 1)) (append! x x) (append! y
-y)
-```
+    Then `(equal? x y)` would evaluate to #t.
 
-Then (equal? x y) would evaluate to #t.
-
-5 For any particular two objects, the result returned by equal? is
-always the same during a period of time over which no mutation occurs.
+5. For any particular two objects, the result returned by equal? is
+   always the same during a period of time over which no mutation
+   occurs.
 
 It is generally recommended that equal? return false in all cases
 where these rules do not require it to return true.
@@ -2238,28 +2234,28 @@ where these rules do not require it to return true.
 This applicative will be generalized to handle zero or more arguments
 in §6.6.1.
 
-Rationale:
-
-The Kernel predicate equal?, unlike its Scheme counterpart, has to
-terminate for all possible arguments (since it isn't given
-dispensation to do otherwise). The set of cases in which equal? is
-required, by Rule 3 above, to return false is formally undecidable;
-that doesn't interfere with termination of equal?, but does guarantee
-that the terminating predicate returns false in some cases where it
-isn't required to. (Terminating predicate eq?  must similarly return
-false in some unrequired cases; see §4.10.)  The set of cases in which
-equal? is required to return true, by Rule 4 above, might appear at
-first glance to be undecidable but, in practice, it is
-unproblematically decidable. Because Rule 4 stipulates that the
-determining program can only examine the objects passively, the
-determining program cannot get bogged down in comparing the formally
-undecidable active behavior of algorithms; degree of encapsulation
-doesn't actually matter to this point, as, for example, if the body of
-a compound combiner were made publicly visible so that it could be
-used in the determination, different algorithms that do the same thing
-would be un-equal?  (hence un-eq? ) exactly because the combiners
-could by supposition be distinguished via their syntactically distinct
-bodies.
+> Rationale:
+>
+> The Kernel predicate equal?, unlike its Scheme counterpart, has to
+> terminate for all possible arguments (since it isn't given
+> dispensation to do otherwise). The set of cases in which equal? is
+> required, by Rule 3 above, to return false is formally undecidable;
+> that doesn't interfere with termination of equal?, but does
+> guarantee that the terminating predicate returns false in some cases
+> where it isn't required to. (Terminating predicate eq?  must
+> similarly return false in some unrequired cases; see §4.10.)  The
+> set of cases in which equal? is required to return true, by Rule 4
+> above, might appear at first glance to be undecidable but, in
+> practice, it is unproblematically decidable. Because Rule 4
+> stipulates that the determining program can only examine the objects
+> passively, the determining program cannot get bogged down in
+> comparing the formally undecidable active behavior of algorithms;
+> degree of encapsulation doesn't actually matter to this point, as,
+> for example, if the body of a compound combiner were made publicly
+> visible so that it could be used in the determination, different
+> algorithms that do the same thing would be un-equal?  (hence un-eq?
+> ) exactly because the combiners could by supposition be
+> distinguished via their syntactically distinct bodies.
 
 ### 4.4 Symbols
 
@@ -2273,11 +2269,12 @@ The external representations of symbols are usually identifiers
 symbols with other external representations may be created; see
 §13.1.1.
 
-Rationale:
-
-Symbols are useful as lookup keys for environments (§§3.2, 4.8), thus
-providing the base case for nontrivial evaluation (§3.3), exactly
-because they are isomorphic to their external representations.
+> Rationale:
+>
+> Symbols are useful as lookup keys for environments (§§3.2, 4.8),
+> thus providing the base case for nontrivial evaluation (§3.3),
+> exactly because they are isomorphic to their external
+> representations.
 
 #### 4.4.1 symbol?
 
@@ -2294,62 +2291,65 @@ consists of a single immutable value, having external representation
 Library features of the core Control module will be described in
 §§5.1, 5.6, and 6.9.
 
-Rationale:
-
-Some combiners are called for their side effects, not their results. In
-the C family of languages, functions called for effect have return type
-void . The later Scheme reports describe the results of for-effect
-procedures as ‘unspecified', which is a politically neces- sary hedge
-because different Scheme implementations already in place follow a
-variety of
-
-conventions concerning the return values of such
-procedures. Unfortunately, some Scheme implementations allow for-effect
-procedures to return useful information, which creates a temptation
-for programmers to write anti-portable code by using the
-result. Kernel avoids this regrettable turn of events by explicitly
-requiring the result of each for-effect combiner to be inert. Since the
-inert type is encapsulated, its one instance doesn't carry any usable
-information beyond its identity and type, which are isomorphic. (But
-see §3.7.)
-
-Merely replacing "unspecified" with "inert" in the descriptions of
-standard combiners would violate the spirit of G1b of §0.1.2, which
-calls for duplicability of built-in facilities by the
-programmer. Hence the inert value must also have a full external
-representation (as opposed to an output-only representation, §3.6), to
-facilitate explicit programmer declaration of for-effect combiners.
+> Rationale:
+>
+> Some combiners are called for their side effects, not their
+> results. In the C family of languages, functions called for effect
+> have return type void . The later Scheme reports describe the
+> results of for-effect procedures as ‘unspecified', which is a
+> politically neces- sary hedge because different Scheme
+> implementations already in place follow a variety of conventions
+> concerning the return values of such procedures. Unfortunately, some
+> Scheme implementations allow for-effect procedures to return useful
+> information, which creates a temptation for programmers to write
+> anti-portable code by using the result. Kernel avoids this
+> regrettable turn of events by explicitly requiring the result of
+> each for-effect combiner to be inert. Since the inert type is
+> encapsulated, its one instance doesn't carry any usable information
+> beyond its identity and type, which are isomorphic. (But see §3.7.)
+>
+> Merely replacing "unspecified" with "inert" in the descriptions of
+> standard combiners would violate the spirit of G1b of §0.1.2, which
+> calls for duplicability of built-in facilities by the
+> programmer. Hence the inert value must also have a full external
+> representation (as opposed to an output-only representation, §3.6),
+> to facilitate explicit programmer declaration of for-effect
+> combiners.
 
 #### 4.5.1 inert?
 
+```scheme
 (inert? . objects)
+```
 
 The primitive type predicate for type inert.
 
 #### 4.5.2 $if
 
-($if htesti hconsequenti halternativei)
+```scheme
+($if <test> <consequent> <alternative>)
+```
 
-The $if operative first evaluates htesti in the dynamic environment
-(that is, the environment in which the ($if ...) combination is
-evaluated). If the result is not of type boolean, an error is
-signaled. If the result is true, hconsequenti is then evaluated in the
-dynamic environment as a tail context (§3.10). Otherwise,
-halternativei is evaluated in the dynamic environment as a tail
-context.
+The `$if` operative first evaluates `<test>` in the dynamic
+environment (that is, the environment in which the ($if ...)
+combination is evaluated). If the result is not of type boolean, an
+error is signaled. If the result is true, hconsequenti is then
+evaluated in the dynamic environment as a tail context
+(§3.10). Otherwise, halternativei is evaluated in the dynamic
+environment as a tail context.
 
-Rationale:
-
-Partitioning of types, §3.5.
-
-On the exclusion of non-boolean results from conditional tests, see
-the rationale under
+> Rationale:
+>
+> Partitioning of types, §3.5.
+>
+> On the exclusion of non-boolean results from conditional tests, see
+> the rationale under
 
 In R5RS Scheme, the halternativei operand to if is optional; and if it
 is omitted, and htesti evaluates to false, the result is ‘unspecified'
 — which would mean, in Kernel, that the result would be inert. For
-consistency with the design purpose of `#inert` — which is to convey no
-information— two-operand $if ought to return `#inert` regardless of
+consistency with the design purpose of `#inert` — which is to convey
+no information— two-operand $if ought to return `#inert` regardless of
 whether hconsequenti is evaluated; but at that point, it becomes
 evident that the two- and three-operand operations are really
 separate, and by rights ought not to be lumped into a single operative
@@ -2390,25 +2390,31 @@ with these types will be described in §§5.2, 5.4, 5.7, and 6.3.
 
 This module assumes the Numbers module (§12). (See §§5.7, 6.3.)
 
-Rationale:
-
-The Numbers module is used to measure and index lists.
-
-The primitive type predicate for type pair.
-
-The primitive type predicate for type null.
+> Rationale:
+>
+> The Numbers module is used to measure and index lists.
 
 #### 4.6.1 pair?
 
+```scheme
 (pair? . objects)
+```
+
+The primitive type predicate for type pair.
 
 #### 4.6.2 null?
 
+```scheme
 (null? . objects)
+```
+
+The primitive type predicate for type null.
 
 #### 4.6.3 cons
 
+```scheme
 (cons object1 object2 )
+```
 
 A new pair object is constructed and returned, whose car and cdr
 referents are respectively object1 and object2 .
@@ -2427,19 +2433,22 @@ the Equivalence under mutation module (§4.2), and the Numbers module
 (§12). Library features of the module will be described in §§5.8 and
 6.4.
 
-Rationale:
-
-The Equivalence under mutation module is assumed because pairs may be
-equal? without being eq? . The Numbers module is used to index lists.
+> Rationale:
+>
+> The Equivalence under mutation module is assumed because pairs may
+> be equal? without being eq? . The Numbers module is used to index
+> lists.
 
 #### 4.7.1 set-car!, set-cdr!
 
-(set-car! pair object) (set-cdr! pair object)
+```scheme
+(set-car! pair object)
+(set-cdr! pair object)
+```
 
 These applicatives set the referent of, respectively, the car
-reference or the cdr
-
-reference of pair to object. The result of the expression is inert.
+reference or the cdr reference of pair to object. The result of the
+expression is inert.
 
 Recall, from §3.1, that the act of setting the referent of a reference
 after object creation constitutes a mutation of the object containing
@@ -2448,7 +2457,9 @@ an immutable object, the error must be signaled.
 
 #### 4.7.2 copy-es-immutable
 
+```scheme
 (copy-es-immutable object)
+```
 
 The short description of this applicative is that it returns an object
 equal? to object with an immutable evaluation structure. The "-es-" in
@@ -2477,67 +2488,64 @@ implementation.  (This is in contrast to library applicative copy-es,
 §6.4.2, which always returns a non-eq? pair when given a pair as
 argument.)
 
-Rationale:
-
-Whenever unexpected operand capturing occurs (i.e., an unevaluated
-operand is ac- quired by a combiner that the caller thought was
-applicative), there is a risk of unexpected operand mutation. Most
-algorithms, however, are intended by the programmer to be im- mutable,
-and therefore, when an object is primarily meant to represent an
-algorithm, mutating it is a dangerous activity that ought to be
-difficult to do by accident (G3 of §0.1.2). The notion of the
-‘evaluation structure' of an object is meant to correspond to the
-algorithm that the object represents. Combiners that are used
-particularly to construct representations of algorithms acquire
-immutable copies of the given evaluation structures: $vau (§4.10.3)
-and load (§15.2.2) do this; but eval (§4.8.3) does not, since it
-should be able to induce arbitrary evaluations, and arbitrary
-evaluations must admit mutable struc- tures (else one could never pass
-an argument for mutation, as to set-car! and set-cdr!,
-§4.7.1). Applicative copy-es-immutable empowers the programmer to
-duplicate these built-in Kernel facilities (G1b of §0.1.2).
-
-Symbols aren't copied by the applicative because, although they
-clearly play a direct role in specifying algorithms, they are
-immutable so there is never any need to make immutable
-copies. Alternatively, one could claim that they are copied, but
-because they are immutable, the copies are eq? to the originals.
-
-The possibility was considered of providing a primitive applicative
-cons-immutable , which would return an immutable pair with given car
-and cdr. However, cons-immutable would support an altogether different
-capability from copy-es-immutable . On one hand, cons-immutable would
-not support library derivation of copy-es-immutable , which can handle
-self-referencing structures that cannot be copied one pair at a time
-without mutat- ing some pair after construction to create a cycle. On
-the other hand, cons-immutable would empower the programmer to create
-an immutable pair whose car or cdr refer- ent is a mutable pair, which
-cannot be done with copy-es-immutable . The selective power of
-cons-immutable would thus allow much more intricate patterns of
-structure immutability, and ought not to be introduced into a
-simplicity-oriented language without a compelling reason; the Kernel
-design calls for generality in the service of simplicity, not
-generality for its own sake.
-
-Strictly speaking, copy-es-immutable could have been listed as a
-library feature.  It can be derived using $vau , by exploiting the
-fact that $vau immutably copies the evaluation structures of the
-bodies of compound operatives. We prefer to list copy-es- immutable as
-a primitive prior to $vau , so that we can explain and discuss
-immutable copies of evaluation structure separately from the more central
-aspects of $vau . For perspective, though, here is a derivation of
-copy-es-immutable .
-
-```scheme
-($define! copy-es-immutable
-
-($lambda (object)
-
-(((wrap $vau) ()
-
-#ignore
-(cons (unwrap list) object)))))
-```
+> Rationale:
+>
+> Whenever unexpected operand capturing occurs (i.e., an unevaluated
+> operand is ac- quired by a combiner that the caller thought was
+> applicative), there is a risk of unexpected operand mutation. Most
+> algorithms, however, are intended by the programmer to be im-
+> mutable, and therefore, when an object is primarily meant to
+> represent an algorithm, mutating it is a dangerous activity that
+> ought to be difficult to do by accident (G3 of §0.1.2). The notion
+> of the ‘evaluation structure' of an object is meant to correspond to
+> the algorithm that the object represents. Combiners that are used
+> particularly to construct representations of algorithms acquire
+> immutable copies of the given evaluation structures: $vau (§4.10.3)
+> and load (§15.2.2) do this; but eval (§4.8.3) does not, since it
+> should be able to induce arbitrary evaluations, and arbitrary
+> evaluations must admit mutable struc- tures (else one could never
+> pass an argument for mutation, as to set-car! and set-cdr!,
+> §4.7.1). Applicative copy-es-immutable empowers the programmer to
+> duplicate these built-in Kernel facilities (G1b of §0.1.2).
+>
+> Symbols aren't copied by the applicative because, although they
+> clearly play a direct role in specifying algorithms, they are
+> immutable so there is never any need to make immutable
+> copies. Alternatively, one could claim that they are copied, but
+> because they are immutable, the copies are eq? to the originals.
+>
+> The possibility was considered of providing a primitive applicative
+> cons-immutable , which would return an immutable pair with given car
+> and cdr. However, cons-immutable would support an altogether
+> different capability from copy-es-immutable . On one hand,
+> cons-immutable would not support library derivation of
+> copy-es-immutable , which can handle self-referencing structures
+> that cannot be copied one pair at a time without mutat- ing some
+> pair after construction to create a cycle. On the other hand,
+> cons-immutable would empower the programmer to create an immutable
+> pair whose car or cdr refer- ent is a mutable pair, which cannot be
+> done with copy-es-immutable . The selective power of cons-immutable
+> would thus allow much more intricate patterns of structure
+> immutability, and ought not to be introduced into a
+> simplicity-oriented language without a compelling reason; the Kernel
+> design calls for generality in the service of simplicity, not
+> generality for its own sake.
+>
+> Strictly speaking, copy-es-immutable could have been listed as a
+> library feature.  It can be derived using `$vau`, by exploiting the
+> fact that $vau immutably copies the evaluation structures of the
+> bodies of compound operatives. We prefer to list copy-es- immutable
+> as a primitive prior to $vau , so that we can explain and discuss
+> immutable copies of evaluation structure separately from the more
+> central aspects of $vau . For perspective, though, here is a
+> derivation of copy-es-immutable .
+>
+> ```scheme
+> ($define! copy-es-immutable
+>   ($lambda (object)
+>     (((wrap $vau) () #ignore
+>      (cons (unwrap list) object)))))
+> ```
 
 ### 4.8 Environments
 
@@ -2568,67 +2576,75 @@ An auxiliary data type used by combiners that perform binding is
 ignore. The ignore type consists of a single immutable value, having
 external representation `#ignore`. The ignore type is encapsulated.
 
-Rationale:
-
-First-class environments offer a tremendous amount of control over what
-can be ac- cessed from where — but only if there are limitations
-carefully placed on what can be done without explicit permission.  In
-particular, whenever a combiner is called, it has the opportunity, in
-principle, to mutate the dynamic environment in which it was called.
-This power is balanced by omitting any general facility for
-determining the parents of a given environment, and also omitting any
-other general facility for mutating the parents, or other ancestors,
-of a given environment. (For an example of articulate environment-
-access control, see $provide!, §6.8.2.)
-
-The behavior of equal? is tied to that of eq? to forestall the
-possibility of an im- plementation compromising the encapsulation of
-the type by allowing a program to de- termine, in finite time, that all
-bindings for one environment are the same as those for (Cf. the
-rationale discussion for the derivation of library predicate $binds?,
-another.  §6.7.1.)
-
-Type ignore is provided specifically for use in parameter matching;
-see §4.9.1, below.  (Contrast type inert, §4.5, also an encapsulated
-type with a single value, but provided specifically for non-use.)
-
-The primitive type predicate for type environment.
-
-The primitive type predicate for type ignore.
+> Rationale:
+>
+> First-class environments offer a tremendous amount of control over
+> what can be ac- cessed from where — but only if there are
+> limitations carefully placed on what can be done without explicit
+> permission.  In particular, whenever a combiner is called, it has
+> the opportunity, in principle, to mutate the dynamic environment in
+> which it was called.  This power is balanced by omitting any general
+> facility for determining the parents of a given environment, and
+> also omitting any other general facility for mutating the parents,
+> or other ancestors, of a given environment. (For an example of
+> articulate environment- access control, see $provide!, §6.8.2.)
+>
+> The behavior of equal? is tied to that of eq? to forestall the
+> possibility of an im- plementation compromising the encapsulation of
+> the type by allowing a program to de- termine, in finite time, that
+> all bindings for one environment are the same as those for (Cf. the
+> rationale discussion for the derivation of library predicate
+> $binds?, another.  §6.7.1.)
+>
+> Type ignore is provided specifically for use in parameter matching;
+> see §4.9.1, below.  (Contrast type inert, §4.5, also an encapsulated
+> type with a single value, but provided specifically for non-use.)
 
 ##### 4.8.1 environment?
 
+```
 (environment? . objects)
+```
+
+The primitive type predicate for type environment.
 
 #### 4.8.2 ignore?
 
+```
 (ignore? . objects)
+```
+
+The primitive type predicate for type ignore.
 
 #### 4.8.3 eval
 
+```scheme
 (eval expression environment)
+```
 
 and returns the resulting value.
 
-Rationale:
-
-The eval applicative evaluates expression as a tail context (§3.10) in
-environment,
-
-The eval applicative provides two notable facilities to the language:
-the useful facility of evaluating an expression twice, i.e.,
-evaluating the result of evaluating the operand, and the essential
-facility of explicitly specifying what environment will be used for
-(the second) evaluation. Evaluating twice could be be achieved without
-eval, by wrapping an applicative (§4.10.4); but eval is the only
-primitive combiner in the core modules that supports explicit
-specification of the evaluation environment. Without that facility,
-user- defined operatives would be unable to effectively regulate
-evaluation of their operands.
+> Rationale:
+>
+> The eval applicative evaluates expression as a tail context (§3.10)
+> in environment,
+>
+> The eval applicative provides two notable facilities to the
+> language: the useful facility of evaluating an expression twice,
+> i.e., evaluating the result of evaluating the operand, and the
+> essential facility of explicitly specifying what environment will be
+> used for (the second) evaluation. Evaluating twice could be be
+> achieved without eval, by wrapping an applicative (§4.10.4); but
+> eval is the only primitive combiner in the core modules that
+> supports explicit specification of the evaluation
+> environment. Without that facility, user- defined operatives would
+> be unable to effectively regulate evaluation of their operands.
 
 #### 4.8.4 make-environment
 
+```scheme
 (make-environment . environments)
+```
 
 The applicative constructs and returns a new environment, with
 initially no local bindings, and parent environments the environments
@@ -2642,20 +2658,20 @@ found locally or in any of the parents.
 
 As with the cons applicative (§4.6.3), the general laws governing
 mutation (§3.8) and eq? (§4.2.1) conspire to guarantee that the
-objects returned by two different calls to make-environment are not eq?
-.
+objects returned by two different calls to make-environment are not
+eq?.
 
-Rationale:
-
-Symbol lookup in an environment is by depth-first search of the
-environment's im- proper ancestors (§3.2).  If there is no local
-binding for the symbol, the parents are searched; and if at least one
-of the parents exhibits a binding for the symbol, the binding is used
-whose exhibiting parent occurs first on the list of parents. Because
-searching a parent has no side-effects (i.e., nothing is mutated by the
-search), the ordered search of the parents must terminate in finite
-time even if the list of parents is cyclic (per the rationale
-discussion in §3.9); cf. assoc , §6.3.6.
+> Rationale:
+>
+> Symbol lookup in an environment is by depth-first search of the
+> environment's im- proper ancestors (§3.2).  If there is no local
+> binding for the symbol, the parents are searched; and if at least
+> one of the parents exhibits a binding for the symbol, the binding is
+> used whose exhibiting parent occurs first on the list of
+> parents. Because searching a parent has no side-effects (i.e.,
+> nothing is mutated by the search), the ordered search of the parents
+> must terminate in finite time even if the list of parents is cyclic
+> (per the rationale discussion in §3.9); cf. assoc , §6.3.6.
 
 ### 4.9 Environment mutation (optional)
 
@@ -2663,36 +2679,37 @@ This module consists of just those standard combiners that mutate
 environments.  Library features of the module will be described in
 §6.8.
 
-Rationale:
-
-There is no need for this module to assume the Equivalence under
-mutation module, because environments are eq? iff they are equal? .
-
-It isn't clear to what extent one can do serious Kernel programming
-without mutating environments; but separating the mutators into an
-optional module allows language im- plementors to explore this
-question within the bounds of Kernel specified by this report.  In the
-absence of environment mutators as such, the programmer would
-presumably fall back on Kernel's rich vocabulary of environment
-constructors (notably the $let family, as §5.10.1), which the report
-does not class as mutators, although environment initializa- tion is
-routinely described in terms of adding bindings. (See especially the
-definition of $letrec , in §6.7.5.)
-
-Per §3.4, language extensions are judged against features described in
-the report rather than against features actually supported by the
-extending implementation; so, failure to support features in the
-Environment mutation module as a whole does not prevent a
-non-comprehensive implementation from providing alternative means for
-doing some of the same things.
-
-For an example of the subtle interplay between environment mutation,
-recursion, and sequencing, see the derivation of $sequence , in §5.1.1.
+> Rationale:
+>
+> There is no need for this module to assume the Equivalence under
+> mutation module, because environments are eq? iff they are equal? .
+>
+> It isn't clear to what extent one can do serious Kernel programming
+> without mutating environments; but separating the mutators into an
+> optional module allows language im- plementors to explore this
+> question within the bounds of Kernel specified by this report.  In
+> the absence of environment mutators as such, the programmer would
+> presumably fall back on Kernel's rich vocabulary of environment
+> constructors (notably the $let family, as §5.10.1), which the report
+> does not class as mutators, although environment initializa- tion is
+> routinely described in terms of adding bindings. (See especially the
+> definition of $letrec , in §6.7.5.)
+>
+> Per §3.4, language extensions are judged against features described
+> in the report rather than against features actually supported by the
+> extending implementation; so, failure to support features in the
+> Environment mutation module as a whole does not prevent a
+> non-comprehensive implementation from providing alternative means
+> for doing some of the same things.
+>
+> For an example of the subtle interplay between environment mutation,
+> recursion, and sequencing, see the derivation of $sequence , in
+> §5.1.1.
 
 #### 4.9.1 $define!
 
 ```scheme
-($define! hdefiniendi hexpressioni)
+($define! <definiend> hexpressioni)
 ```
 
 `<definiend>` should be a formal parameter tree, as described below;
@@ -2700,13 +2717,13 @@ otherwise, an error is signaled.
 
 The `$define!` operative evaluates `hexpressioni` in the dynamic
 environment (that is, the environment in which the `($define! ...)`
-combination is evaluated), and matches `hdefiniendi` to the result in
-the dynamic environment, binding each symbol in `hdefiniendi` in the
+combination is evaluated), and matches `<definiend>` to the result in
+the dynamic environment, binding each symbol in `<definiend>` in the
 dynamic environment to the corresponding part of the result; the
 matching process will be further described below. The ancestors of the
 dynamic environment, if any, are unaffected by the matching process,
 as are all bindings, local to the dynamic environment, of symbols not
-in `hdefiniendi`. The result returned by `$define!` is inert.
+in `<definiend>`. The result returned by `$define!` is inert.
 
 A formal parameter tree has the following context-free structure.
 
@@ -2726,36 +2743,41 @@ once. Thus, if a pair is reachable by more than one path, there must
 be no symbols reachable from it.
 
 Matching of a formal parameter tree t to an object o in an environment
-e proceeds recursively as follows. If the matching process fails, an error is signaled.
+e proceeds recursively as follows. If the matching process fails, an
+error is signaled.
 
-• If t is a symbol, then t is bound to o in e.
+- If t is a symbol, then t is bound to o in e.
 
-• If t is `#ignore`, no action is taken.
+- If t is `#ignore`, no action is taken.
 
-• If t is nil, then o must be nil (else matching fails).
+- If t is nil, then o must be nil (else matching fails).
 
-• If t is a pair, then o must be a pair (else matching fails). The car
-of t is matched
+- If t is a pair, then o must be a pair (else matching fails). The car
+  of t is matched to the car of o in e, and the cdr of t is matched to
+  the cdr of o in e.
 
-to the car of o in e, and the cdr of t is matched to the cdr of o in
-e.
+> Rationale:
+>
+> In R5RS Scheme, define can only be used in certain contexts. No
+> attempt was made in Kernel to imitate this context-sensitivity, as
+> it was considered philosophically incompatible with making the
+> $define! combiner first-class.
+>
+> Formal parameter trees were first developed for Kernel's $vau
+> operative (§4.10.3), as a generalization of the formal parameter
+> lists of Scheme's lambda operative. Formal parameter trees are
+> permitted uniformly in every situation (G1 of §0.1.2) where a
+> definiend is given, i.e., where binding is specified.[11] By
+> empowering versatile interaction between the separately versatile
+> devices of pair-based data structures and first-class environments,
+> the uniform generalization of definiends expands the practical
+> versatility of both. A case in point —as well as a notable effect in
+> its own right— is the convergence of consequences by which uniform
+> generalized definiends in Kernel eliminate the motivation for one of
+> the more semantically baroque features of many Lisps: so-called
+> "multiple-value returns".
 
-Rationale:
-
-In R5RS Scheme, define can only be used in certain contexts. No
-attempt was made in Kernel to imitate this context-sensitivity, as it
-was considered philosophically incompatible with making the $define!
-combiner first-class.
-
-Formal parameter trees were first developed for Kernel's $vau operative
-(§4.10.3), as a generalization of the formal parameter lists of
-Scheme's lambda operative. Formal parameter trees are permitted
-uniformly in every situation (G1 of §0.1.2) where a definiend is given,
-i.e., where binding is specified.11 By empowering versatile interaction
-between the separately versatile devices of pair-based data structures
-and first-class environments,
-
-11For the natural-linguistically curious: The suffix -end in English
+[11] For the natural-linguistically curious: The suffix -end in English
 mathematical terms such as addend, dividend, etc., is a simple
 shortening of the Latin gerundive suffix -endum. From addere to add,
 addendum thing to be added; from subtrahere to take away, subtrahendum
@@ -2763,13 +2785,6 @@ thing to be taken away; dividere to divide, dividendum thing to be
 divided. The preceding are all -ere Latin verbs, though. For -ire
 verbs the gerundive suffix is -iendum; hence, from definire to define,
 definiendum thing to be defined.
-
-the uniform generalization of definiends expands the practical
-versatility of both. A case in point —as well as a notable effect in
-its own right— is the convergence of consequences by which uniform
-generalized definiends in Kernel eliminate the motivation for one of
-the more semantically baroque features of many Lisps: so-called
-"multiple-value returns".
 
 The idea of multiple-value returns is to view the basic functional
 model of computa- tion, which says that each function call returns a
