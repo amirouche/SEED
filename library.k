@@ -3,10 +3,10 @@
 ;   derivations are as in the R-1RK, not chosen for efficiency
 ;
 
-(define! sequence
+(define sequence
    ((wrap (vau (seq2) %ignore
              (seq2
-                (define! aux
+                (define aux
                    (vau (head . tail) env
                       (if (null? tail)
                            (eval head env)
@@ -22,19 +22,19 @@
          ((wrap (vau %ignore %ignore (eval second env)))
           (eval first env)))))
 
-(define! list (wrap (vau x %ignore x)))
+(define list (wrap (vau x %ignore x)))
 
-(define! list*
+(define list*
    (wrap (vau args %ignore
             (sequence
-               (define! aux
+               (define aux
                   (wrap (vau ((head . tail)) %ignore
                            (if (null? tail)
                                 head
                                 (cons head (aux tail))))))
                (aux args)))))
 
-(define! vau
+(define vau
    ((wrap (vau (vau) %ignore
              (vau (formals eformal . body) env
                 (eval (list vau formals eformal
@@ -42,56 +42,56 @@
                       env))))
       vau))
 
-(define! lambda
+(define lambda
    (vau (formals . body) env
       (wrap (eval (list* vau formals %ignore body)
                   env))))
 
-(define! car (lambda ((x . %ignore)) x))
-(define! cdr (lambda ((%ignore . x)) x))
+(define car (lambda ((x . %ignore)) x))
+(define cdr (lambda ((%ignore . x)) x))
 
-(define! caar (lambda (((x . %ignore) . %ignore)) x))
-(define! cdar (lambda (((%ignore . x) . %ignore)) x))
-(define! cadr (lambda ((%ignore . (x . %ignore))) x))
-(define! cddr (lambda ((%ignore . (%ignore . x))) x))
+(define caar (lambda (((x . %ignore) . %ignore)) x))
+(define cdar (lambda (((%ignore . x) . %ignore)) x))
+(define cadr (lambda ((%ignore . (x . %ignore))) x))
+(define cddr (lambda ((%ignore . (%ignore . x))) x))
 
-(define! caaar (lambda ((((x . %ignore) . %ignore) . %ignore)) x))
-(define! cdaar (lambda ((((%ignore . x) . %ignore) . %ignore)) x))
-(define! cadar (lambda (((%ignore . (x . %ignore)) . %ignore)) x))
-(define! cddar (lambda (((%ignore . (%ignore . x)) . %ignore)) x))
-(define! caadr (lambda ((%ignore . ((x . %ignore) . %ignore))) x))
-(define! cdadr (lambda ((%ignore . ((%ignore . x) . %ignore))) x))
-(define! caddr (lambda ((%ignore . (%ignore . (x . %ignore)))) x))
-(define! cdddr (lambda ((%ignore . (%ignore . (%ignore . x)))) x))
+(define caaar (lambda ((((x . %ignore) . %ignore) . %ignore)) x))
+(define cdaar (lambda ((((%ignore . x) . %ignore) . %ignore)) x))
+(define cadar (lambda (((%ignore . (x . %ignore)) . %ignore)) x))
+(define cddar (lambda (((%ignore . (%ignore . x)) . %ignore)) x))
+(define caadr (lambda ((%ignore . ((x . %ignore) . %ignore))) x))
+(define cdadr (lambda ((%ignore . ((%ignore . x) . %ignore))) x))
+(define caddr (lambda ((%ignore . (%ignore . (x . %ignore)))) x))
+(define cdddr (lambda ((%ignore . (%ignore . (%ignore . x)))) x))
 
-(define! caaaar (lambda (((((x . %ignore) . %ignore) . %ignore). %ignore))x))
-(define! cdaaar (lambda (((((%ignore . x) . %ignore) . %ignore). %ignore))x))
-(define! cadaar (lambda ((((%ignore . (x . %ignore)) . %ignore). %ignore))x))
-(define! cddaar (lambda ((((%ignore . (%ignore . x)) . %ignore). %ignore))x))
-(define! caadar (lambda (((%ignore . ((x . %ignore) . %ignore)). %ignore))x))
-(define! cdadar (lambda (((%ignore . ((%ignore . x) . %ignore)). %ignore))x))
-(define! caddar (lambda (((%ignore . (%ignore . (x . %ignore))). %ignore))x))
-(define! cdddar (lambda (((%ignore . (%ignore . (%ignore . x))). %ignore))x))
-(define! caaadr (lambda ((%ignore .(((x . %ignore) . %ignore) . %ignore)))x))
-(define! cdaadr (lambda ((%ignore .(((%ignore . x) . %ignore) . %ignore)))x))
-(define! cadadr (lambda ((%ignore .((%ignore . (x . %ignore)) . %ignore)))x))
-(define! cddadr (lambda ((%ignore .((%ignore . (%ignore . x)) . %ignore)))x))
-(define! caaddr (lambda ((%ignore .(%ignore . ((x . %ignore) . %ignore))))x))
-(define! cdaddr (lambda ((%ignore .(%ignore . ((%ignore . x) . %ignore))))x))
-(define! cadddr (lambda ((%ignore .(%ignore . (%ignore . (x . %ignore)))))x))
-(define! cddddr (lambda ((%ignore .(%ignore . (%ignore . (%ignore . x)))))x))
+(define caaaar (lambda (((((x . %ignore) . %ignore) . %ignore). %ignore))x))
+(define cdaaar (lambda (((((%ignore . x) . %ignore) . %ignore). %ignore))x))
+(define cadaar (lambda ((((%ignore . (x . %ignore)) . %ignore). %ignore))x))
+(define cddaar (lambda ((((%ignore . (%ignore . x)) . %ignore). %ignore))x))
+(define caadar (lambda (((%ignore . ((x . %ignore) . %ignore)). %ignore))x))
+(define cdadar (lambda (((%ignore . ((%ignore . x) . %ignore)). %ignore))x))
+(define caddar (lambda (((%ignore . (%ignore . (x . %ignore))). %ignore))x))
+(define cdddar (lambda (((%ignore . (%ignore . (%ignore . x))). %ignore))x))
+(define caaadr (lambda ((%ignore .(((x . %ignore) . %ignore) . %ignore)))x))
+(define cdaadr (lambda ((%ignore .(((%ignore . x) . %ignore) . %ignore)))x))
+(define cadadr (lambda ((%ignore .((%ignore . (x . %ignore)) . %ignore)))x))
+(define cddadr (lambda ((%ignore .((%ignore . (%ignore . x)) . %ignore)))x))
+(define caaddr (lambda ((%ignore .(%ignore . ((x . %ignore) . %ignore))))x))
+(define cdaddr (lambda ((%ignore .(%ignore . ((%ignore . x) . %ignore))))x))
+(define cadddr (lambda ((%ignore .(%ignore . (%ignore . (x . %ignore)))))x))
+(define cddddr (lambda ((%ignore .(%ignore . (%ignore . (%ignore . x)))))x))
 
-(define! apply
+(define apply
    (lambda (appv arg . opt)
       (eval (cons (unwrap appv) arg)
             (if (null? opt)
                  (make-environment)
                  (car opt)))))
 
-(define! cond
+(define cond
    (vau clauses env
 
-      (define! aux
+      (define aux
          (lambda ((test . body) . clauses)
             (if (eval test env)
                  (apply (wrap sequence) body env)
@@ -101,10 +101,10 @@
            %inert
            (apply aux clauses))))
 
-(define! get-list-metrics
+(define get-list-metrics
    (lambda (ls)
 
-      (define! aux
+      (define aux
          (lambda (kth k nth n)
             (if (>=? k n)
                  (if (pair? (cdr nth))
@@ -121,13 +121,13 @@
            (aux ls 0 ls 0)
            (list 0 (if (null? ls) 1 0) 0 0))))
 
-(define! list-tail
+(define list-tail
    (lambda (ls k)
       (if (>? k 0)
            (list-tail (cdr ls) (- k 1))
            ls)))
 
-(define! encycle!
+(define encycle!
    (lambda (ls k1 k2)
       (if (>? k2 0)
            (set-cdr! (list-tail ls (+ k1 k2 -1))
@@ -140,20 +140,20 @@
 ;   to test map, and without using anything derived later than map
 ;
 
-(define! max
+(define max
    (lambda x
 
-      (define! aux
+      (define aux
          (lambda (count result . x)
             (if (<=? count 0)
                  result
                  (sequence
                     (if (>? (car x) result)
-                         (define! result (if (inexact? result)
+                         (define result (if (inexact? result)
                                                (* (car x) 1.0)
                                                (car x)))
                          (if (inexact? (car x))
-                              (define! result (* result 1.0))
+                              (define result (* result 1.0))
                               %inert))
                     (apply aux (list* (- count 1) result (cdr x)))))))
 
@@ -161,10 +161,10 @@
                         %e-infinity
                         x))))
 
-(define! lcm
+(define lcm
    (lambda x
 
-      (define! gcd
+      (define gcd
          (lambda (x y)
             (if (=? x y)
                  x             ; don't worry here about inexactness
@@ -172,11 +172,11 @@
                       (gcd x (- y x))
                       (gcd (- x y) y)))))
 
-      (define! aux3
+      (define aux3
          (lambda (x y)
             (/ (* x y) (gcd x y))))
 
-      (define! aux2
+      (define aux2
          (lambda (result k)
             (cond ((=? k 0)                 (* k %e+infinity)) ; induce error
                    ((=? k %e+infinity)       (* k result))
@@ -184,7 +184,7 @@
                    ((=? result %e+infinity)  (* result (abs k)))
                    (#t                       (aux3 result (abs k))))))
 
-      (define! aux
+      (define aux
          (lambda (count result . x)
             (if (<=? count 0)
                  result
@@ -200,12 +200,12 @@
 ; now, back to core derivations
 ;
 
-(define! map
+(define map
    (wrap (vau (appv . lss) env
 
-      (define! acc
+      (define acc
          (lambda (input (k1 k2) base-result head tail sum)
-            (define! aux
+            (define aux
                (lambda (input count)
                   (if (=? count 0)
                        base-result
@@ -213,18 +213,18 @@
                             (aux (tail input) (- count 1))))))
             (aux input (+ k1 k2))))
 
-      (define! enlist
+      (define enlist
          (lambda (input ms head tail)
-            (define! result (acc input ms () head tail cons))
+            (define result (acc input ms () head tail cons))
             (apply encycle! (list* result ms))
             result))
 
-      (define! mss (cddr (get-list-metrics lss)))
+      (define mss (cddr (get-list-metrics lss)))
 
-      (define! cars (lambda (lss) (enlist lss mss caar cdr)))
-      (define! cdrs (lambda (lss) (enlist lss mss cdar cdr)))
+      (define cars (lambda (lss) (enlist lss mss caar cdr)))
+      (define cdrs (lambda (lss) (enlist lss mss cdar cdr)))
 
-      (define! result-metrics
+      (define result-metrics
          (acc lss mss (cddr (get-list-metrics (car lss)))
               (lambda (lss) (cddr (get-list-metrics (car lss))))
               cdr
@@ -239,18 +239,18 @@
               (lambda (lss) (apply appv (cars lss) env))
               cdrs))))
 
-(define! let
+(define let
    (vau (bindings . body) env
       (eval (cons (list* lambda (map car bindings) body)
                   (map cadr bindings))
             env)))
 
-(define! not? (lambda (x) (if x #f #t)))
+(define not? (lambda (x) (if x #f #t)))
 
-(define! and?
+(define and?
    (lambda x
 
-      (define! aux
+      (define aux
          (lambda (x k)
             (cond ((<=? k 0)  #t)
                    ((car x)    (aux (cdr x) (- k 1)))
@@ -258,59 +258,59 @@
 
       (aux x (car (get-list-metrics x)))))
 
-(define! or?
+(define or?
    (lambda x
       (not? (apply and? (map not? x)))))
 
-(define! and?
+(define and?
    (vau x e
       (cond ((null? x)         #t)
              ((null? (cdr x))   (eval (car x) e)) ; tail context
              ((eval (car x) e)  (apply (wrap and?) (cdr x) e))
              (#t                #f))))
 
-(define! or?
+(define or?
    (vau x e
       (cond ((null? x)         #f)
              ((null? (cdr x))   (eval (car x) e)) ; tail context
              ((eval (car x) e)  #t)
              (#t                (apply (wrap or?) (cdr x) e)))))
 
-(define! combiner?
+(define combiner?
    (lambda x
       (apply and? (map (lambda (x)
                           (or? (applicative? x)
                                (operative? x)))
                        x))))
 
-(define! length
+(define length
    (lambda (object)
       (let (((%ignore %ignore a c)  (get-list-metrics object)))
          (if (>? c 0)
               %e+infinity
               a))))
 
-(define! list-ref
+(define list-ref
    (lambda (ls k)
       (car (list-tail ls k))))
 
-(define! append
+(define append
    (lambda lss
 
-      (define! set-last!
+      (define set-last!
          (lambda (ls tail) ; set cdr of last pair of ls to tail
             (let ((next  (cdr ls)))
                (if (pair? next)
                     (set-last! next tail)
                     (set-cdr! ls tail)))))
 
-      (define! aux2
+      (define aux2
          (lambda (ls tail) ; prepend ls onto tail
             (if (null? ls)
                  tail
                  (cons (car ls) (aux2 (cdr ls) tail)))))
 
-      (define! aux1
+      (define aux1
          (lambda (k lss tail) ; prepend k elmts of lss onto tail
             (if (>? k 0)
                  (aux2 (car lss)
@@ -328,10 +328,10 @@
                       (aux1 a lss cycle))
                    (aux1 (- a 1) lss (list-ref lss (- a 1))))))))
 
-(define! list-neighbors
+(define list-neighbors
    (lambda (ls)
 
-      (define! aux
+      (define aux
          (lambda (ls n) ; get n sets of neighbors from ls
             (if (>? n 0)
                  (cons (list (car ls) (cadr ls))
@@ -345,7 +345,7 @@
                  (encycle! ls a c)
                  ls)))))
 
-(define! filter
+(define filter
    (lambda (accept? ls)
       (apply append
              (map (lambda (x)
@@ -354,7 +354,7 @@
                           ()))
                   ls))))
 
-(define! assoc
+(define assoc
    (lambda (object alist)
       (let ((alist  (filter (lambda (record)
                                 (equal? object (car record)))
@@ -363,13 +363,13 @@
               ()
               (car alist)))))
 
-(define! member?
+(define member?
    (lambda (object ls)
       (apply or?
              (map (lambda (x) (equal? object x))
                   ls))))
 
-(define! finite-list?
+(define finite-list?
    (lambda args
       (apply and?
              (map (lambda (x)
@@ -378,7 +378,7 @@
                         (>? n 0)))
                   args))))
 
-(define! countable-list?
+(define countable-list?
    (lambda args
       (apply and?
              (map (lambda (x)
@@ -388,10 +388,10 @@
                               (>? n 0))))
                   args))))
 
-(define! reduce
+(define reduce
    (let ()
 
-      (define! reduce-acyclic
+      (define reduce-acyclic
          (lambda (ls bin id)
             (cond ((null? ls)        id)
                    ((null? (cdr ls))  (car ls))
@@ -399,7 +399,7 @@
                       (bin (car ls)
                            (reduce-acyclic (cdr ls) bin id))))))
 
-      (define! reduce-n
+      (define reduce-n
          (lambda (ls bin n)
             (if (=? n 1)
                  (car ls)
@@ -408,18 +408,18 @@
 
       (wrap (vau (ls bin id . opt) env
 
-         (define! fixenv
+         (define fixenv
             (lambda (appv)
                (lambda x (apply appv x env))))
 
-         (define! bin (fixenv bin))
+         (define bin (fixenv bin))
 
          (let (((p n a c)  (get-list-metrics ls)))
             (if (=? c 0)
                  (reduce-acyclic ls bin id)
                  (sequence
-                    (define! (pre in post) (map fixenv opt))
-                    (define! reduced-cycle
+                    (define (pre in post) (map fixenv opt))
+                    (define reduced-cycle
                        (post (reduce-n (map pre (list-tail ls a))
                                        in
                                        c)))
@@ -428,10 +428,10 @@
                          (bin (reduce-n ls bin a)
                               reduced-cycle)))))))))
 
-(define! append!
+(define append!
    (lambda lss
 
-      (define! set-last!
+      (define set-last!
          (lambda (ls tail)
             (let ((next  (cdr ls)))
                (if (pair? next)
@@ -446,10 +446,10 @@
 
 ;; commented out because:  wow, this is slow.
 ;
-; (define! copy-es
+; (define copy-es
 ;    (lambda (x)
 ; 
-;       (define! aux
+;       (define aux
 ;          (lambda (x alist)
 ;             (if (not? (pair? x))
 ;                  (list x alist)
@@ -468,7 +468,7 @@
 ;
 ;;
 
-(define! assq
+(define assq
    (lambda (object alist)
       (let ((alist (filter (lambda (record)
                                (eq? object (car record)))
@@ -477,13 +477,13 @@
               ()
               (car alist)))))
 
-(define! memq?
+(define memq?
    (lambda (object ls)
       (apply or?
              (map (lambda (x) (eq? object x))
                   ls))))
 
-(define! eq?
+(define eq?
    (let ((old-eq?  eq?))
       (lambda x
          (if (and? (pair? x) (pair? (cdr x)) (null? (cddr x)))
@@ -491,7 +491,7 @@
               (apply and?
                      (map (lambda (x) (apply old-eq? x))
                           (list-neighbors x)))))))
-(define! equal?
+(define equal?
    (let ((old-equal?  equal?))
       (lambda x
          (if (and? (pair? x) (pair? (cdr x)) (null? (cddr x)))
@@ -500,7 +500,7 @@
                      (map (lambda (x) (apply old-equal? x))
                           (list-neighbors x)))))))
 
-(define! binds?
+(define binds?
    (vau (exp . ss) dynamic
       (guard-dynamic-extent
          ()
@@ -513,12 +513,12 @@
                      (lambda (%ignore divert)
                         (apply divert #f)))))))
 
-(define! get-current-environment (wrap (vau () e e)))
+(define get-current-environment (wrap (vau () e e)))
 
-(define! make-kernel-standard-environment
+(define make-kernel-standard-environment
    (lambda () (get-current-environment)))
 
-(define! let*
+(define let*
    (vau (bindings . body) env
       (eval (if (null? bindings)
                  (list* let bindings body)
@@ -527,16 +527,16 @@
                        (list* let* (cdr bindings) body)))
             env)))
 
-(define! letrec
+(define letrec
    (vau (bindings . body) env
       (eval (list* let ()
-                   (list define!
+                   (list define
                          (map car bindings)
                          (list* list (map cadr bindings)))
                    body)
             env)))
 
-(define! letrec*
+(define letrec*
    (vau (bindings . body) env
       (eval (if (null? bindings)
                  (list* letrec bindings body)
@@ -545,7 +545,7 @@
                        (list* letrec* (cdr bindings) body)))
             env)))
 
-(define! let-redirect
+(define let-redirect
    (vau (exp bindings . body) env
       (eval (list* (eval (list* lambda (map car bindings) body)
                          (eval exp
@@ -553,7 +553,7 @@
                    (map cadr bindings))
             env)))
 
-(define! let-safe
+(define let-safe
    (vau (bindings . body) env
       (eval (list* let-redirect
                    (make-kernel-standard-environment)
@@ -561,11 +561,11 @@
                    body)
              env)))
 
-(define! remote-eval
+(define remote-eval
    (vau (o e) d
       (eval o (eval e d))))
 
-(define! bindings->environment
+(define bindings->environment
    (vau bindings denv
       (eval (list let-redirect
                   (make-environment)
@@ -573,21 +573,21 @@
                   (list get-current-environment))
             denv)))
 
-(define! set!
+(define set!
    (vau (exp1 formals exp2) env
-      (eval (list define! formals
+      (eval (list define formals
                   (list (unwrap eval) exp2 env))
             (eval exp1 env))))
 
-(define! provide!
+(define provide!
    (vau (symbols . body) env
-      (eval (list define! symbols
+      (eval (list define symbols
                (list let ()
                   (list* sequence body)
                   (list* list symbols)))
             env)))
 
-(define! import!
+(define import!
    (vau (exp . symbols) env
       (eval (list set!
                   env
@@ -595,7 +595,7 @@
                   (cons list symbols))
             (eval exp env))))
 
-(define! for-each
+(define for-each
    (wrap (vau x env
             (apply map x env)
             %inert)))
@@ -604,16 +604,16 @@
 ; derived non-core features
 ;
 
-(define! apply-continuation
+(define apply-continuation
    (lambda (c o)
       (apply (continuation->applicative c) o)))
 
-(define! let/cc
+(define let/cc
    (vau (symbol . body) env
       (eval (list call/cc (list* lambda (list symbol) body))
             env)))
 
-(define! guard-dynamic-extent
+(define guard-dynamic-extent
    (wrap (vau (entry-guards combiner exit-guards) env
 
       (let ((local  (get-current-environment)))
@@ -637,37 +637,37 @@
                (lambda %ignore
                   (apply combiner () env))))))))
 
-(define! exit
+(define exit
    (lambda ()
       (apply-continuation root-continuation %inert)))
 
 (provide! (promise? memoize lazy force)
 
-   (define! (encapsulate promise? decapsulate)
+   (define (encapsulate promise? decapsulate)
              (make-encapsulation-type))
 
-   (define! memoize
+   (define memoize
       (lambda (value)
          (encapsulate (list (cons value ())))))
 
-   (define! lazy
+   (define lazy
       (vau (exp) env
          (encapsulate (list (cons exp env)))))
 
-   (define! force
+   (define force
       (lambda (x)
          (if (not? (promise? x))
               x
               (force-promise (decapsulate x)))))
 
-   (define! force-promise
+   (define force-promise
       (lambda (x)
          (let ((((object . env))  x))
             (if (not? (environment? env))
                  object
                  (handle-promise-result x (eval object env))))))
 
-   (define! handle-promise-result
+   (define handle-promise-result
       (lambda (x y)
          (cond ((null? (cdar x))    ; check for earlier result
                    (caar x))
@@ -679,22 +679,22 @@
                    (set-car! x (car (decapsulate y)))  ; iterate
                    (force-promise x))))))
 
-(define! abs (lambda (x) (if (<? x 0) (* x -1) x)))
+(define abs (lambda (x) (if (<? x 0) (* x -1) x)))
 
-(define! min
+(define min
    (lambda x
 
-      (define! aux
+      (define aux
          (lambda (count result . x)
             (if (<=? count 0)
                  result
                  (sequence
                     (if (<? (car x) result)
-                         (define! result (if (inexact? result)
+                         (define result (if (inexact? result)
                                                (* (car x) 1.0)
                                                (car x)))
                          (if (inexact? (car x))
-                              (define! result (* result 1.0))
+                              (define result (* result 1.0))
                               %inert))
                     (apply aux (list* (- count 1) result (cdr x)))))))
 
@@ -702,7 +702,7 @@
                         %e+infinity
                         x))))
 
-(define! get-module
+(define get-module
    (lambda (filename . opt)
       (let ((env  (make-kernel-standard-environment)))
          (cond ((pair? opt)

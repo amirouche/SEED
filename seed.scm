@@ -1367,7 +1367,7 @@
          "make-environment"
          0 -1 kernel-environment?)
 
-        'define!
+        'define
         (action->checked-operative
          (lambda (operand-tree env context)
            (let ((ed  (match! env (kernel-car operand-tree)
@@ -1376,7 +1376,7 @@
              (if (error-descriptor? ed)
                  (begin
                    (error-add-to-first-line!  ed
-                                              " when calling #[operative define!]")
+                                              " when calling #[operative define]")
                    (error-pass ed context))
                  inert)))
          2 2)
@@ -1649,7 +1649,7 @@
   ;; The purpose of this condition is to all clients to preserve structural
   ;; isomorphism.  This is a strictly more difficult task than merely preventing
   ;; infinite traversal of cyclic structures.  For example, commands
-  ;;   ($define! x (list 1 2 3))
+  ;;   (define x (list 1 2 3))
   ;;   (set-car! x (cdr x))
   ;; would produce acyclic structure  (#1=(2 3) . #1#)  whose revisit-list would
   ;; be a singleton list of node #1#.  Merely to prevent infinite traversals,
