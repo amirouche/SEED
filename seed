@@ -1,2 +1,2 @@
 #!/bin/sh
-cat $1 | letloop exec seed.scm
+echo "(import (chezscheme) (seed)) (seed-exec \"$1\")" | letloop repl .
