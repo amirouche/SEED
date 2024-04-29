@@ -319,7 +319,7 @@
         ;;     (apply and? (kernel-list->list operand-tree)))
         ;;   0 -1 boolean?)
 
-        '$if
+        'if
         (action->checked-operative
          (lambda (operand-tree env context)
            (let ((test  (kernel-eval (kernel-car operand-tree) env context)))
@@ -329,7 +329,7 @@
                      (kernel-eval (kernel-caddr operand-tree) env context))
                  (error-pass
                   (make-error-descriptor
-                   "Non-boolean test result, when calling #[operative $if]")
+                   "Non-boolean test result, when calling #[operative if]")
                   context))))
          3 3)
 
@@ -1367,7 +1367,7 @@
          "make-environment"
          0 -1 kernel-environment?)
 
-        '$define!
+        'define!
         (action->checked-operative
          (lambda (operand-tree env context)
            (let ((ed  (match! env (kernel-car operand-tree)
@@ -1376,7 +1376,7 @@
              (if (error-descriptor? ed)
                  (begin
                    (error-add-to-first-line!  ed
-                                              " when calling #[operative $define!]")
+                                              " when calling #[operative define!]")
                    (error-pass ed context))
                  inert)))
          2 2)
@@ -3083,7 +3083,7 @@
                        (combiner 'meta)
                        (kernel-cons 'applicative (unwrap combiner))))))
 
-        '$vau
+        'vau
         (action->checked-operative
          (lambda (operand-tree static-env context)
            (let ((parameter-tree  (copy-es-immutable
@@ -4072,7 +4072,7 @@
                                (set! okay #f)))))
               (if okay
                   (begin
-                    (kernel-eval (list->kernel-list '(load "library.snk"))
+                    (kernel-eval (list->kernel-list '(load "library.k"))
                                  ground-environment context)
                     (let loop ()
                       (let ((sexp (scheme-read-object->kernel (read port))))
