@@ -1,5 +1,5 @@
-(define add2
+(define add1
   (lambda (f)
-    (+ f 2)))
+    (+ f 1)))
 
-(display (add2 40))
+(display (add1 (add1 40)))
