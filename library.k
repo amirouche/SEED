@@ -43,9 +43,13 @@
       vau))
 
 (define lambda
-   (vau (formals . body) env
-      (wrap (eval (list* vau formals %ignore body)
-                  env))))
+  (vau (formals . body) env
+    (wrap (eval (list* vau formals %ignore body)
+                env))))
+
+(define symbol (vau (x) %ignore x))
+(define quote (vau (x) %ignore (list (symbol quote) x)))
+(define quasiquote (vau (x) %ignore (list (symbol quasiquote) x)))
 
 (define car (lambda ((x . %ignore)) x))
 (define cdr (lambda ((%ignore . x)) x))

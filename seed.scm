@@ -23,8 +23,13 @@
   (export seed-exec)
   (import (chezscheme))
 
-
-  (define any? (lambda args #t))   
+  (define pk
+    (lambda args
+      (display "; ")
+      (write args)
+      (car (reverse args))))
+  
+  (define any? (lambda args #t))
 
   ;;
   ;; Evaluate an expression in an environment, with given youngest enclosing
@@ -520,7 +525,7 @@
   (define action->applicative
     (lambda (action)
       (wrap (action->operative action))))
-  
+
   ;;
   ;; Predicates the combiner type.
   ;;
@@ -873,7 +878,7 @@
             (set-marks! destination #f)
             ((destination 'receiver) (serial-transform selected value)))))))
 
-  
+
   ;;
   ;; Given a value, determines whether that value is a list in the Kernel sense,
   ;; i.e., either a finite list terminated by nil, or a cyclic list.
@@ -1343,7 +1348,7 @@
       (define copy-kernel-list->list
         (lambda (ls)
           (define bounded-simple-map->list (make-bounded-simple-map cons))
-          
+
           (bounded-simple-map->list (car (get-list-metrics ls))
                                     (lambda (x) x)
                                     ls)))
@@ -1816,7 +1821,7 @@
              (else      x))
            x))))
 
-  
+
   ;;
   ;; Given a kernel-list, returns a freshly allocated list with the same elements
   ;; in the same order.
@@ -1826,7 +1831,7 @@
   (define copy-kernel-list->list
     (lambda (ls)
       (define bounded-simple-map->list (make-bounded-simple-map cons))
-      
+
       (bounded-simple-map->list (car (get-list-metrics ls))
                                 (lambda (x) x)
                                 ls)))
@@ -3076,12 +3081,37 @@
 
         'operative?  (unary-predicate->applicative operative?)
 
+        ;; TODO: meta is an applicative, requires a clean up move.
         'meta (action->applicative
                (lambda (args env context)
                  (let ((combiner (kernel-car args)))
                    (if (operative? combiner)
                        (combiner 'meta)
                        (kernel-cons 'applicative (unwrap combiner))))))
+
+        ;; It is an operative to make the call cleaner. I
+        ;; Instead of:
+        ;;
+        ;;   (xenoops 'foreign-alloc '(chezscheme))
+        ;;
+        ;; It is possible, and cleaner to write:
+        ;;
+        ;;   (xeno foreign-alloc (chezscheme))
+        ;;
+        ;; Where arguments are passed as symbol. That *should* not
+        ;; break things as long as xeno calls are not before runtime.
+        'xeno (action->checked-operative
+               (lambda (args env context)
+                 (let ((name (kernel-car args))
+                       (library (if (null? (kernel-cdr args))
+                                    '(chezscheme)
+                                    (copy-kernel-list->list (kernel-car (kernel-cdr args))))))
+                   (let ((proc (symbol->procedure name library)))
+                     (action->applicative
+                      (lambda (args env context)
+                        (apply proc (copy-kernel-list->list args)))))))
+               
+               1 1)
 
         'vau
         (action->checked-operative
@@ -3691,7 +3721,13 @@
 
       (aux x y)))
 
- 
+  (define symbol->procedure
+    (case-lambda
+     ((symbol)
+      (eval symbol (environment '(chezscheme))))
+     ((symbol library)
+      (eval symbol (environment library)))))
+  
   ;;
   ;; Creates bindings for handling cyclic structures in a given environment.
   ;;
@@ -3840,7 +3876,7 @@
          1 1 string?)
 
         )
-      
+
       (bind-applicative-primitives!      ground-environment)
       (bind-boolean-primitives!          ground-environment)
       (bind-context-primitives!          ground-environment)
@@ -3858,7 +3894,7 @@
 
       (call-with-input-file filename
         (lambda (port)
-          
+
           ;;
           ;; The library bindings.
           ;;
